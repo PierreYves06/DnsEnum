@@ -1,5 +1,10 @@
 # DnsEnum
 
+#24/02/2017
+Ajout de la fonction Spider qui permet de bruteforcer l'arborescence d'un domaine
+
+
+#Origine
 Un énumérateur DNS sommaire
 Le fichier launch.py à la racine sert d'illustration et de test pour le moment, l'application est amené à s'améliorer.
 
