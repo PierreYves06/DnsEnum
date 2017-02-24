@@ -4,7 +4,7 @@
 Ajout de la fonction Spider qui permet de bruteforcer l'arborescence d'un domaine
 
 
-#Origine
+#16/11/2016
 Un énumérateur DNS sommaire
 Le fichier launch.py à la racine sert d'illustration et de test pour le moment, l'application est amené à s'améliorer.
 
