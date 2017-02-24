@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 from dom.dnsenum import *
+from dom.spider import *
 
 class Domain:
     "Classe qui modelise un domaine et les operations possibles sur ce dernier"
