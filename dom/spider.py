@@ -62,7 +62,7 @@ class Spider():
 		result={}
 		requestInit=Request(url)
 		#print('Requete : ' + url)
-		time.sleep(1)
+		time.sleep(2)
 		HTTPConnection.debuglevel = 0
 		openerErr = build_opener(openanything.DefaultErrorHandler())
 		self.processHttpError(openerErr, requestInit, result, url)
@@ -92,8 +92,12 @@ class Spider():
 		#Si la liste finale est vide, c'est la premiére itération sur le domaine, on teste la redirection
 		if (listeFin == []):
 			#print('Test initial')
-
-			result=self.requestBF(self.domain.url)
+			dom=self.domain.url
+			if (dom[:6] != 'http://'):
+				dom='http://' + self.domain.url
+			if (dom[-1] != '/'):
+				dom=dom + '/'
+			result=self.requestBF(dom)
 			#print(result)
 			for cle,valeur in result.items():
 				#Si le code HTTP est 200 et que la liste result a plus d un element, c'est une redirection
@@ -109,7 +113,7 @@ class Spider():
 				if (line[0] == '#'):
 					continue
 
-				#Si la liste finale n'est pas vide, c'est la premiére itération sur le domaine,
+				#Si la liste finale n'est pas vide, ce n'est pas la premiére itération sur le domaine,
 				if (listeFin != []):
 					for dictio in listeFin[-1]:
 						for url,code in dictio.items():
@@ -124,7 +128,7 @@ class Spider():
 								self.codeFilter(result, listTree)
 				else:
 					#print(self.domain.url+line)
-					result=self.requestBF(self.domain.url+line)
+					result=self.requestBF(dom)
 					#print('Test actuel : ' + line)
 					#print(result)
 				self.codeFilter(result, listTree)

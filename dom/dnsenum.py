@@ -190,8 +190,9 @@ class Dnsenum():
         else:
             self.domain.setTXT('No answer')
     
-    def processReverseDns(self, IP):
+    def processReverseDns(self):
         "Methode qui effectue une recherche en reverse DNS sur le sous reseau de classe C de l'IP du domaine"
+        IP=self.domain.getIP()
         dictRevDNS={}
         width = len(IP)
         if (width >= 10):
@@ -205,7 +206,7 @@ class Dnsenum():
             outputRev=subprocess.check_output('dig -x ' + IP + str(host), shell=True)
             resultRev=self.readOutput(outputRev)
             if ((resultRev != 'No answer') and (resultRev != {})):
-                print(resultRev)
+                #print(resultRev)
                 if isinstance(resultRev['ans'], str):
                     match=self.processLine(resultRev['ans'])
                     dictRevDNS[IP + str(host)]=match

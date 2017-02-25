@@ -11,13 +11,41 @@ class displayCLI(Thread):
 	def __init__(self, dom):
 		Thread.__init__(self)
 		self.running = False
-		#if (dom[:6] != 'http://'):
-		#	dom='http://' + dom
+		if (dom[:6] == 'http://'):
+			dom=dom[6:]
 		#if (dom[-1] != '/'):
 		#	dom=dom + '/'
 		self.target=Domain(dom)
 
-	def lectureAttr(self, liste):
+	def parseListeDictio(self, liste):
+		if (isinstance(liste, str)):
+			print(liste)
+		else:
+			for item in liste:
+				for key,value in item.items():
+					print(key + ' : ' + value)
+
+	def processResponseYN(self, response):
+		while (response != 'y') and (response != 'n'):
+			print(choice + ' : Choix inconnu')
+			response=input('Faites un nouveau choix svp (y/n) : ')
+		if (response == 'y'):
+			return True
+		else:
+			return False
+
+	def lectureOtherResponse(self, dictio):
+		for key,value in dictio.items():
+			print('IP : ' + key)
+			print('Resultat(s) : ')
+			if (isinstance(value, str)):
+				print(value)
+			else:
+				for item in value:
+					print(item)
+
+
+	def lectureDigResponse(self, liste):
 		if liste == []:
 			print('Pas de réponse')
 		else:
@@ -25,29 +53,64 @@ class displayCLI(Thread):
 				print(liste)
 			else:
 				print('Reponse : ')
-				print(liste['ans'])
+				if (liste['ans'] == 'empty'):
+					print('Pas de réponse')
+				else:
+					self.parseListeDictio(liste['ans'])
+
 				print('Informations additionnelles : ')
-				print(liste['add'])
+				if (liste['add'] == 'empty'):
+					print('Pas d\'informations additionnelles')
+				else:
+					self.parseListeDictio(liste['add'])
 
 	def displayDnsEnum(self):
 		print('IP de la cible : ')
-		self.lectureAttr(self.target.getIP())
+		self.lectureDigResponse(self.target.getIP())
 		print('Nameserver de la cible : ')
-		self.lectureAttr(self.target.getNS())
+		self.lectureDigResponse(self.target.getNS())
+		print('Serveur mail de la cible : ')
+		self.lectureDigResponse(self.target.getMX())
+		print('Enregistrement TXT de la cible : ')
+		self.lectureDigResponse(self.target.getTXT())
 
 	def enumSolo(self):
-		print('EnumSolo')
 		dnsenum=Dnsenum(self.target, 'test.txt')
-		print('Enumeration DNS en cours')
+		print('Enumeration DNS en cours...')
 		dnsenum.processDig()
 		print('Fait')
 		self.displayDnsEnum()
 
+		choice=input('Voulez vous effectuer un reverse DNS de classe C sur la cible ? (y/n) : ')
+		resp=self.processResponseYN(choice)
+		if (resp):
+			print('Reverse DNS de classe C en cours...')
+			dnsenum.processReverseDns()
+			print('Fait')
+			print('Resultat du reverse DNS de classe C :')
+			self.lectureOtherResponse(self.target.getReverseDNS())
+		else:
+			print('Reverse DNS ignore')
+
+		choice=input('Voulez vous effectuer un brute-force des sous-domaines sur la cible ? (y/n) : ')
+		resp=self.processResponseYN(choice)
+		if (resp):
+			print('Brute-force des sous-domaines en cours...')
+			dnsenum.processBFSubDomain()
+			print('Resultat du brute-force des sous domaines : ')
+			self.lectureOtherResponse(self.target.getSubDomain())
+		else:
+			print('Brute-force des sous-domaines ignore')
+
 	def spiderSolo(self):
-		print('SpiderSolo')
+		spider=Spider(self.target, 'test.txt')
+		print('Brute-force de l\'arborescence en cours... ')
+		print(spider.processDepthSpider(2))
 
 	def enumSpider(self):
 		print('EnumSpider')
+		self.enumSolo()
+		self.spiderSolo()
 
 	def quitCLI(self):
 		print('Bye !')
