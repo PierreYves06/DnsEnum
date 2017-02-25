@@ -1,12 +1,15 @@
 #PenTesting Scout v1.0
 
-Usage:
+#Usage:
+
     pentestingscout.py DOMAIN
 
-Arguments:
+#Arguments:
+        
     DOMAIN      le domaine cible
 
-Options:
+#Options:
+    
     -h --help   show this help message and exit
     
     --version   show version and exit
