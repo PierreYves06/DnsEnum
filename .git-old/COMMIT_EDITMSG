@@ -1,0 +1,39 @@
+Merge branch 'master' of https://github.com/PierreYves06/DnsEnum
+
+Conflicts:
+	display/__pycache__/displayCLI.cpython-34.pyc
+	dom/__pycache__/dnsenum.cpython-34.pyc
+	dom/__pycache__/spider.cpython-34.pyc
+#
+# Il semble que vous validiez une fusion.
+# Si ce n'est pas le cas, veuillez supprimer le fichier
+#	.git/MERGE_HEAD
+# et essayez à nouveau.
+
+
+# Veuillez saisir le message de validation pour vos modifications. Les lignes
+# commençant par '#' seront ignorées, et un message vide abandonne la validation.
+#
+# Validateur : PierreYves06 <root@PenTest>
+#
+# Sur la branche master
+# Votre branche et 'origin/master' ont divergé,
+# et ont 1 et 12 commits différents chacune respectivement.
+#   (utilisez "git pull" pour fusionner la branche distante dans la vôtre)
+#
+# Tous les conflits sont réglés mais la fusion n'est pas terminée.
+#
+# Modifications qui seront validées :
+#	modifié :         README.md
+#	supprimé :        display/__pycache__/displayCLI.cpython-34.pyc
+#	supprimé :        dom/__init__.pyc
+#	supprimé :        dom/__pycache__/__init__.cpython-34.pyc
+#	supprimé :        dom/__pycache__/dnsenum.cpython-34.pyc
+#	supprimé :        dom/__pycache__/domain.cpython-34.pyc
+#	supprimé :        dom/__pycache__/spider.cpython-34.pyc
+#	supprimé :        lib/__pycache__/__init__.cpython-34.pyc
+#	supprimé :        lib/__pycache__/openanything.cpython-34.pyc
+#
+# Fichiers non suivis:
+#	.gitignore
+#
