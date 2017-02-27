@@ -78,6 +78,8 @@ class Spider():
 				requestRedir=Request(f.newurl)
 				#print('Requete de redirection : ' + f.newurl)
 				self.processHttpError(openerErr, requestRedir, result, f.newurl)
+				if (str(result[url])[0] == '4') or (str(result[url])[0] == '5'):
+					return result
 				fRedir = openerRed.open(requestRedir)
 				codeRedir=fRedir.status
 				result[f.newurl]=fRedir.status
@@ -143,4 +145,4 @@ class Spider():
 		while (i < depth):
 			listTriFinal.append(self.processSpider(listTriFinal))
 			i += 1
-		return listTriFinal
+		self.domain.setArbo(listTriFinal)

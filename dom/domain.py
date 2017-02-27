@@ -51,3 +51,8 @@ class Domain:
     def setSubDomain(self, subDomain):
         self.subDomain=subDomain
 
+    def setArbo(self, arbo):
+        self.arbo=arbo
+
+    def getArbo(self):
+        return self.arbo

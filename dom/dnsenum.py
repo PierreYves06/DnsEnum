@@ -224,13 +224,19 @@ class Dnsenum():
         dictBFSubDom={}
         with open(self.dictio, 'r') as f:
             count=0
-            for line in f:
-                if (line[0] == '#'):
-                    continue
-                tryBF=line.strip('\n')
-                count+=1
-                try:
-                    outputtryBF=subprocess.check_output('dig ' + tryBF + '.' + self.domain.url, stderr=subprocess.STDOUT, shell=True)
+            try:
+                for line in f:
+                    if (line[0] == '#'):
+                        continue
+                    tryBF=line.strip('\n')
+                    print(tryBF)
+                    count+=1
+                    try:
+                    	outputtryBF=subprocess.check_output('dig ' + tryBF + '.' + self.domain.url, stderr=subprocess.STDOUT, shell=True)
+                    except:
+                        print('Erreur Brute Force')
+                        #input()
+                        continue
                     resultTryBF=self.readOutput(outputtryBF)
                     if (resultTryBF != 'No answer'):
                         if isinstance(resultTryBF['ans'], str):
@@ -242,7 +248,11 @@ class Dnsenum():
                                 match=self.processLine(item)
                                 listBFSubDom.append(match)
                             dictBFSubDom[tryBF + '.' + self.domain.url]=listBFSubDom
-                except:
-                    continue
+                    #except:
+                        #continue
+            except UnicodeDecodeError as e:
+                print('UnicodeDecodeError')
+                input()
+                #pass
             f.close()
             self.domain.setSubDomain(dictBFSubDom)

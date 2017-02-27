@@ -8,7 +8,7 @@ from dom.domain import *
 class displayCLI(Thread):
 	"""Classe qui modelise l'affichage en console"""
 
-	def __init__(self, dom):
+	def __init__(self, dom, dictio='directories.jbrofuzz'):
 		Thread.__init__(self)
 		self.running = False
 		if (dom[:6] == 'http://'):
@@ -16,6 +16,7 @@ class displayCLI(Thread):
 		#if (dom[-1] != '/'):
 		#	dom=dom + '/'
 		self.target=Domain(dom)
+		self.dictio=dictio
 
 	def parseListeDictio(self, liste):
 		if (isinstance(liste, str)):
@@ -75,7 +76,7 @@ class displayCLI(Thread):
 		self.lectureDigResponse(self.target.getTXT())
 
 	def enumSolo(self):
-		dnsenum=Dnsenum(self.target, 'test.txt')
+		dnsenum=Dnsenum(self.target, self.dictio)
 		print('Enumeration DNS en cours...')
 		dnsenum.processDig()
 		print('Fait')
@@ -95,6 +96,7 @@ class displayCLI(Thread):
 		choice=input('Voulez vous effectuer un brute-force des sous-domaines sur la cible ? (y/n) : ')
 		resp=self.processResponseYN(choice)
 		if (resp):
+			print('Dictionnaire utilise : ' + self.dictio)
 			print('Brute-force des sous-domaines en cours...')
 			dnsenum.processBFSubDomain()
 			print('Resultat du brute-force des sous domaines : ')
@@ -103,9 +105,11 @@ class displayCLI(Thread):
 			print('Brute-force des sous-domaines ignore')
 
 	def spiderSolo(self):
-		spider=Spider(self.target, 'test.txt')
+		spider=Spider(self.target, self.dictio)
+		print('Dictionnaire utilise : ' + self.dictio)
 		print('Brute-force de l\'arborescence en cours... ')
-		print(spider.processDepthSpider(2))
+		spider.processDepthSpider(2)
+		print(self.target.getArbo())
 
 	def enumSpider(self):
 		print('EnumSpider')
@@ -126,6 +130,7 @@ class displayCLI(Thread):
 		self.running = True
 		print('Bienvenue !')
 		while self.running:
+			print('Votre cible : ' + self.target.getUrl())
 			print('Que désirez-vous faire ?\n1 - Enumeration DNS\n2 - Spider\n3 - Enumeration DNS + Spider\n4 - Exit')
 			choice=input('Votre choix ? : ')
 			try:
