@@ -1,3 +1,5 @@
 *__pycache__*
 *.py[oc]
 *.bak
+.git-old
+.gitignore
