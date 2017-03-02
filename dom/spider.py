@@ -62,7 +62,7 @@ class Spider():
 		result={}
 		requestInit=Request(url)
 		#print('Requete : ' + url)
-		time.sleep(2)
+		time.sleep(1)
 		HTTPConnection.debuglevel = 0
 		openerErr = build_opener(openanything.DefaultErrorHandler())
 		self.processHttpError(openerErr, requestInit, result, url)
@@ -108,9 +108,14 @@ class Spider():
 					self.domain.setUrl(cle)
 					break
 
-		with open(self.dictio, 'r') as f:
+		with open(self.dictio, 'rb') as f:
 			for line in f:
-
+				try:
+					line=line.decode('utf-8')
+				except UnicodeDecodeError:
+					print('UnicodeDecodeError')
+					input()
+					continue
 				#Commentaire dans le dictionnaire
 				if (line[0] == '#'):
 					continue

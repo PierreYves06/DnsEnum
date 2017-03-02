@@ -1,18 +1,28 @@
-#PenTesting Scout v1.0
+                                =====================
+                                PenTesting Scout v1.0
+                                =====================
 
-#Usage:
+Use it during recognition phase in web site's pentesting. This tool provides
+dns enumeration with class C's reverse DNS and subdomain's bruteforce.
+You can also use it to crawl web site's folder tree. This version is not finished
+yet but it works. Be careful with sub domain's brute-force and spider, default
+dictionnary is huge and this may take time. By default, the spider is settled for
+1 level depth, change it in display/displayCLI.py line 126 but this may result of
+huge amount of HTTP request and possible problem with web's site's admin, even
+with the Law. In theory, this is fully legal because all collected informations
+are public but some sysadmins are nervous in front of log flood, be careful !
 
+
+Usage:
     pentestingscout.py DOMAIN [-d NAME]
 
-#Arguments:
-        
-    DOMAIN      le domaine cible
+Arguments:
+    DOMAIN      website to be test
 
-#Options:
-    
+Options:
     -h --help   show this help message and exit
     --version   show version and exit
-	-d NAME     name of your custom dictionnary, if not, directories.jbrofuzz is used by default
-                This dictionnary must be in the 'dic' directory, at the root of the application
-
+    -d NAME     name of your custom dictionnary, if not, directories.jbrofuzz
+                is used by default.This dictionnary must be in the 'dic' directory,
+                at the root of the application
 

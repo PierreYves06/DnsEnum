@@ -8,7 +8,12 @@ from dom.domain import *
 class displayCLI(Thread):
 	"""Classe qui modelise l'affichage en console"""
 
+	
 	def __init__(self, dom, dictio='directories.jbrofuzz'):
+		"""
+			Initialisation avec demarrage du thread gerant la boucle d affichage, 
+			un objet Domain et un dictionnaire
+		"""
 		Thread.__init__(self)
 		self.running = False
 		if (dom[:6] == 'http://'):
@@ -19,6 +24,7 @@ class displayCLI(Thread):
 		self.dictio=dictio
 
 	def parseListeDictio(self, liste):
+		"""Methode de lecture de la liste de dictionnaire"""
 		if (isinstance(liste, str)):
 			print(liste)
 		else:
@@ -27,6 +33,7 @@ class displayCLI(Thread):
 					print(key + ' : ' + value)
 
 	def processResponseYN(self, response):
+		"""Methode qui traite les choix Oui/Non"""
 		while (response != 'y') and (response != 'n'):
 			print(choice + ' : Choix inconnu')
 			response=input('Faites un nouveau choix svp (y/n) : ')
@@ -36,7 +43,11 @@ class displayCLI(Thread):
 			return False
 
 	def lectureOtherResponse(self, dictio):
+		"""Methode de lecture chelou"""
 		for key,value in dictio.items():
+			print(key)
+			print(value)
+			'''
 			print('IP : ' + key)
 			print('Resultat(s) : ')
 			if (isinstance(value, str)):
@@ -44,9 +55,10 @@ class displayCLI(Thread):
 			else:
 				for item in value:
 					print(item)
-
+			'''
 
 	def lectureDigResponse(self, liste):
+		"""Methode de lecture des retours de dig"""
 		if liste == []:
 			print('Pas de réponse')
 		else:
@@ -66,6 +78,7 @@ class displayCLI(Thread):
 					self.parseListeDictio(liste['add'])
 
 	def displayDnsEnum(self):
+		"""Methode d'affichage de l'enumeration DNS"""
 		print('IP de la cible : ')
 		self.lectureDigResponse(self.target.getIP())
 		print('Nameserver de la cible : ')
@@ -76,6 +89,7 @@ class displayCLI(Thread):
 		self.lectureDigResponse(self.target.getTXT())
 
 	def enumSolo(self):
+		"""Methode qui lance l'enumeration DNS"""
 		dnsenum=Dnsenum(self.target, self.dictio)
 		print('Enumeration DNS en cours...')
 		dnsenum.processDig()
@@ -105,23 +119,26 @@ class displayCLI(Thread):
 			print('Brute-force des sous-domaines ignore')
 
 	def spiderSolo(self):
+		"""Methode qui lance le Spider"""
 		spider=Spider(self.target, self.dictio)
 		print('Dictionnaire utilise : ' + self.dictio)
 		print('Brute-force de l\'arborescence en cours... ')
-		spider.processDepthSpider(2)
+		spider.processDepthSpider(1)
 		print(self.target.getArbo())
 
 	def enumSpider(self):
+		"""Methode qui lance l'enumeration DNS et le Spider"""
 		print('EnumSpider')
 		self.enumSolo()
 		self.spiderSolo()
 
 	def quitCLI(self):
+		"""Methode qui arrete le thread et quitte le CLI"""
 		print('Bye !')
 		self.running = False
 
 	def run(self):
-		
+		"""Methode run du Thread qui lance la boucle d'affichage"""
 		options={'1': self.enumSolo,
 					'2': self.spiderSolo,
 					'3': self.enumSpider,

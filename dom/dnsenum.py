@@ -29,7 +29,6 @@ class Dnsenum():
     def assignInfos(self, result):
         "Methode qui assigne les infos aux divers enregistrements du dictionnaire retourne par la classe"
         dictInfos={}
-                #print result
         if (isinstance(result['ans'], str)):
             dictInfos['ans']=self.processLine(result['ans'])
         else:
@@ -136,12 +135,15 @@ class Dnsenum():
         resultTXT=self.readOutput(outputTXT)
 
         #On extrait les resultats et on les assignent à l'objet Domain passe a la classe
+
+        #Resultat General
         if (resultG != 'No answer'):
             infosG=self.assignInfos(resultG)
             self.domain.setIP(infosG['ans'])
         else:
             self.domain.setIP('No answer')
 
+        #Resultat Nameserver
         if (resultNS != 'No answer'):
             infosNS=self.assignInfos(resultNS)
             if (isinstance(infosNS['ans'], str)):
@@ -161,6 +163,7 @@ class Dnsenum():
         else:
             self.domain.setNS('No answer')
 
+        #Resultat MX
         if (resultMX != 'No answer'):
             infosMX=self.assignInfos(resultMX)
             if (isinstance(infosMX['ans'], str)):
@@ -184,6 +187,7 @@ class Dnsenum():
         else:
             self.domain.setMX('No answer')
 
+		#Resultat TXT
         if (resultTXT != 'No answer'):
             infosTXT=self.assignInfos(resultTXT)
             self.domain.setTXT(infosTXT)
@@ -206,7 +210,6 @@ class Dnsenum():
             outputRev=subprocess.check_output('dig -x ' + IP + str(host), shell=True)
             resultRev=self.readOutput(outputRev)
             if ((resultRev != 'No answer') and (resultRev != {})):
-                #print(resultRev)
                 if isinstance(resultRev['ans'], str):
                     match=self.processLine(resultRev['ans'])
                     dictRevDNS[IP + str(host)]=match
@@ -222,37 +225,42 @@ class Dnsenum():
     def processBFSubDomain(self):
         "Methode de brute force des sous-domaines eventuels base sur un dictionnaire"
         dictBFSubDom={}
-        with open(self.dictio, 'r') as f:
-            count=0
-            try:
-                for line in f:
-                    if (line[0] == '#'):
-                        continue
-                    tryBF=line.strip('\n')
-                    print(tryBF)
-                    count+=1
-                    try:
-                    	outputtryBF=subprocess.check_output('dig ' + tryBF + '.' + self.domain.url, stderr=subprocess.STDOUT, shell=True)
-                    except:
-                        print('Erreur Brute Force')
-                        #input()
-                        continue
-                    resultTryBF=self.readOutput(outputtryBF)
-                    if (resultTryBF != 'No answer'):
-                        if isinstance(resultTryBF['ans'], str):
-                            match=self.processLine(resultTryBF['ans'])
-                            dictBFSubDom[tryBF + '.' + self.domain.url]=match
-                        else:
-                            listBFSubDom=[]
-                            for item in resultTryBF['ans']:
-                                match=self.processLine(item)
-                                listBFSubDom.append(match)
-                            dictBFSubDom[tryBF + '.' + self.domain.url]=listBFSubDom
+        with open(self.dictio, 'rb') as f:
+            #count=0
+            #try:
+            for line in f:
+                try:
+                    line=line.decode('utf-8')
+                except UnicodeDecodeError:
+                    print('UnicodeDecodeError')
+                    input()
+                    continue
+                if (line[0] == '#'):
+                    continue
+                tryBF=line.strip('\n')
+                print(tryBF)
+                #count+=1
+                try:
+                    outputtryBF=subprocess.check_output('dig ' + tryBF + '.' + self.domain.url, stderr=subprocess.STDOUT, shell=True)
+                except:
+                    print('Erreur Brute Force')
+                    continue
+                resultTryBF=self.readOutput(outputtryBF)
+                if (resultTryBF != 'No answer'):
+                    if isinstance(resultTryBF['ans'], str):
+                        match=self.processLine(resultTryBF['ans'])
+                        dictBFSubDom[tryBF + '.' + self.domain.url]=match
+                    else:
+                        listBFSubDom=[]
+                        for item in resultTryBF['ans']:
+                            match=self.processLine(item)
+                            listBFSubDom.append(match)
+                        dictBFSubDom[tryBF + '.' + self.domain.url]=listBFSubDom
                     #except:
                         #continue
-            except UnicodeDecodeError as e:
-                print('UnicodeDecodeError')
-                input()
+            #except UnicodeDecodeError as e:
+                #print('UnicodeDecodeError')
+                #input()
                 #pass
             f.close()
             self.domain.setSubDomain(dictBFSubDom)
