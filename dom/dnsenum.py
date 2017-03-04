@@ -226,20 +226,17 @@ class Dnsenum():
         "Methode de brute force des sous-domaines eventuels base sur un dictionnaire"
         dictBFSubDom={}
         with open(self.dictio, 'rb') as f:
-            #count=0
-            #try:
             for line in f:
                 try:
                     line=line.decode('utf-8')
                 except UnicodeDecodeError:
                     print('UnicodeDecodeError')
-                    input()
+                    #input()
                     continue
                 if (line[0] == '#'):
                     continue
                 tryBF=line.strip('\n')
-                print(tryBF)
-                #count+=1
+                #print(tryBF)
                 try:
                     outputtryBF=subprocess.check_output('dig ' + tryBF + '.' + self.domain.url, stderr=subprocess.STDOUT, shell=True)
                 except:
@@ -256,11 +253,5 @@ class Dnsenum():
                             match=self.processLine(item)
                             listBFSubDom.append(match)
                         dictBFSubDom[tryBF + '.' + self.domain.url]=listBFSubDom
-                    #except:
-                        #continue
-            #except UnicodeDecodeError as e:
-                #print('UnicodeDecodeError')
-                #input()
-                #pass
             f.close()
             self.domain.setSubDomain(dictBFSubDom)

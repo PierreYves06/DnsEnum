@@ -18,8 +18,6 @@ class displayCLI(Thread):
 		self.running = False
 		if (dom[:6] == 'http://'):
 			dom=dom[6:]
-		#if (dom[-1] != '/'):
-		#	dom=dom + '/'
 		self.target=Domain(dom)
 		self.dictio=dictio
 
@@ -154,4 +152,3 @@ class displayCLI(Thread):
 				options[choice]()
 			except KeyError as e:
 				print(choice + ' : Choix inconnu')
-
