@@ -230,17 +230,17 @@ class Dnsenum():
                 try:
                     line=line.decode('utf-8')
                 except UnicodeDecodeError:
-                    print('UnicodeDecodeError')
+                    #print('UnicodeDecodeError')
                     #input()
                     continue
                 if (line[0] == '#'):
                     continue
                 tryBF=line.strip('\n')
-                #print(tryBF)
+                print(tryBF)
                 try:
                     outputtryBF=subprocess.check_output('dig ' + tryBF + '.' + self.domain.url, stderr=subprocess.STDOUT, shell=True)
                 except:
-                    print('Erreur Brute Force')
+                    #print('Erreur Brute Force')
                     continue
                 resultTryBF=self.readOutput(outputtryBF)
                 if (resultTryBF != 'No answer'):

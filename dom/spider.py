@@ -36,7 +36,6 @@ class Spider():
 				#On enleve les parametres d'Url eventuels
 				indexF=cle.find('?')
 				if (indexF != -1):
-					#print('Param GET')
 					dictResult[cle[:indexF]]=valeur
 					del dictResult[cle]
 				listeFiltered.append(dictResult)
@@ -61,22 +60,29 @@ class Spider():
 
 		result={}
 		requestInit=Request(url)
-		#print('Requete : ' + url)
+
+		#On temporise entre chaque requete afin d'eviter les IDS anti DDOS un peu sensible
 		time.sleep(1)
+
+		#Possibilite de rendre les requetes plus verbeuses en cas de probleme
 		HTTPConnection.debuglevel = 0
+
+		#On instancie notre gestionnaire d'erreur et on lui passe la requete
 		openerErr = build_opener(openanything.DefaultErrorHandler())
 		self.processHttpError(openerErr, requestInit, result, url)
 		if (result != {}):
 			return result
 		
+		#On instancie ensuite notre opener traitant les redirections et on lui passe la requete 
 		openerRed = build_opener(openanything.SmartRedirectHandler())
 		f = openerRed.open(requestInit)
 		result[url]=f.status
+
+		#Si redirection, on recommence le traitement erreur+redirection sur la nouvelle URL jusqu'a obtenir un code HTTP 200
 		if ((str(f.status))[0] == '3'):
 			codeRedir=0
 			while (codeRedir != 200):
 				requestRedir=Request(f.newurl)
-				#print('Requete de redirection : ' + f.newurl)
 				self.processHttpError(openerErr, requestRedir, result, f.newurl)
 				if (str(result[url])[0] == '4') or (str(result[url])[0] == '5'):
 					return result
@@ -93,51 +99,45 @@ class Spider():
 
 		#Si la liste finale est vide, c'est la premiére itération sur le domaine, on teste la redirection
 		if (listeFin == []):
-			#print('Test initial')
 			dom=self.domain.url
 			if (dom[:6] != 'http://'):
 				dom='http://' + self.domain.url
 			if (dom[-1] != '/'):
 				dom=dom + '/'
 			result=self.requestBF(dom)
-			#print(result)
 			for cle,valeur in result.items():
 				#Si le code HTTP est 200 et que la liste result a plus d un element, c'est une redirection
 				if (valeur == 200) and (len(result) > 1):
-					#print('Redirection sur la cible.')
+					indexF=cle.find('?')
+					if (indexF != -1):
+						cle=cle[:indexF]
 					self.domain.setUrl(cle)
 					break
 
+		#Debut du brute-force
 		with open(self.dictio, 'rb') as f:
 			for line in f:
 				try:
 					line=line.decode('utf-8')
 				except UnicodeDecodeError:
-					print('UnicodeDecodeError')
-					input()
 					continue
 				#Commentaire dans le dictionnaire
 				if (line[0] == '#'):
 					continue
-
+				line=line.strip('\n')
+				print(line)
 				#Si la liste finale n'est pas vide, ce n'est pas la premiére itération sur le domaine,
 				if (listeFin != []):
 					for dictio in listeFin[-1]:
 						for url,code in dictio.items():
 							if (code in [200, 403]):
-								url=url.strip('\n')
 								#Avec les reecriture d'URL, on ne fait plus la difference entre fichier et dossier
 								if (url[-1] != '/'):
 									url=url+'/'
-								#print('Requete depth : ' + url + line)
 								result=self.requestBF(url+line)
-								#print(result)
 								self.codeFilter(result, listTree)
 				else:
-					#print(self.domain.url+line)
 					result=self.requestBF(dom)
-					#print('Test actuel : ' + line)
-					#print(result)
 				self.codeFilter(result, listTree)
 
 		listTree=self.processDoublons(listTree)

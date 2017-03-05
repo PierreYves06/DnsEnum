@@ -40,20 +40,22 @@ class displayCLI(Thread):
 		else:
 			return False
 
-	def lectureOtherResponse(self, dictio):
+	def lectureOtherResponse(self, dictio, type):
 		"""Methode de lecture chelou"""
 		for key,value in dictio.items():
-			print(key)
-			print(value)
-			'''
-			print('IP : ' + key)
+
+			#Display ReverseDNS
+			if (type=='RD'):
+				print('IP : ' + key)
+			else:
+			#Display Brute-force subdomains
+				print('Sous-domaine : ' + key)
 			print('Resultat(s) : ')
 			if (isinstance(value, str)):
 				print(value)
 			else:
 				for item in value:
 					print(item)
-			'''
 
 	def lectureDigResponse(self, liste):
 		"""Methode de lecture des retours de dig"""
@@ -74,6 +76,21 @@ class displayCLI(Thread):
 					print('Pas d\'informations additionnelles')
 				else:
 					self.parseListeDictio(liste['add'])
+
+	def lectureSpiderResponse(self, liste):
+		"""Methode de lecture des retours du Spider"""
+		lvl=0
+		for item in liste:
+			lvl+=1
+			print('Niveau de l\'arbo : ' + str(lvl))
+			#print(item)
+			for dictio in item:
+				#print(dictio)
+				for key,value in dictio.items():
+					#print('Url : ' + key)
+					#print('Code : ' + str(value))
+					if (value == 200):
+						print(key)
 
 	def displayDnsEnum(self):
 		"""Methode d'affichage de l'enumeration DNS"""
@@ -101,7 +118,7 @@ class displayCLI(Thread):
 			dnsenum.processReverseDns()
 			print('Fait')
 			print('Resultat du reverse DNS de classe C :')
-			self.lectureOtherResponse(self.target.getReverseDNS())
+			self.lectureOtherResponse(self.target.getReverseDNS(), 'RD')
 		else:
 			print('Reverse DNS ignore')
 
@@ -112,7 +129,7 @@ class displayCLI(Thread):
 			print('Brute-force des sous-domaines en cours...')
 			dnsenum.processBFSubDomain()
 			print('Resultat du brute-force des sous domaines : ')
-			self.lectureOtherResponse(self.target.getSubDomain())
+			self.lectureOtherResponse(self.target.getSubDomain(), 'BF')
 		else:
 			print('Brute-force des sous-domaines ignore')
 
@@ -121,8 +138,8 @@ class displayCLI(Thread):
 		spider=Spider(self.target, self.dictio)
 		print('Dictionnaire utilise : ' + self.dictio)
 		print('Brute-force de l\'arborescence en cours... ')
-		spider.processDepthSpider(1)
-		print(self.target.getArbo())
+		spider.processDepthSpider(4)
+		self.lectureSpiderResponse(self.target.getArbo())
 
 	def enumSpider(self):
 		"""Methode qui lance l'enumeration DNS et le Spider"""
