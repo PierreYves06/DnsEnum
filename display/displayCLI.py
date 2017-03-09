@@ -1,7 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-import sys
+import sys, time
 from threading import Thread
 from dom.domain import *
 
@@ -30,6 +30,14 @@ class displayCLI(Thread):
 		else:
 			self.depth=depth
 		self.args=args
+
+	def decoratorTimerProcess(process):
+		def timerProcess(self):
+			start=time.time()
+			process(self)
+			interval=time.time() - start
+			print('\nTemps d execution : ' + str(round(interval, 2)) + ' sec.')
+		return timerProcess
 
 	def parseListeDictio(self, liste):
 		"""Methode de lecture de la liste de dictionnaire"""
@@ -114,6 +122,7 @@ class displayCLI(Thread):
 		print('Enregistrement TXT de la cible : ')
 		self.lectureDigResponse(self.target.getTXT())
 
+	@decoratorTimerProcess
 	def enumSolo(self):
 		"""Methode qui lance l'enumeration DNS"""
 		dnsenum=Dnsenum(self.target, self.dictio)
@@ -144,6 +153,7 @@ class displayCLI(Thread):
 		else:
 			print('Brute-force des sous-domaines ignore')
 
+	@decoratorTimerProcess
 	def spiderSolo(self):
 		"""Methode qui lance le Spider"""
 		spider=Spider(self.target, self.dictio)
