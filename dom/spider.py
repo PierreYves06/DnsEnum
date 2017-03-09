@@ -39,7 +39,6 @@ class Spider():
 					dictResult[cle[:indexF]]=valeur
 					del dictResult[cle]
 				listeFiltered.append(dictResult)
-		
 
 	def processHttpError(self, opener, request, result, url):
 		"""Traitement des erreurs d'URL mal formees et des codes 4** et 5**"""
@@ -96,6 +95,7 @@ class Spider():
 		
 		#On verifie une eventuelle redirection de domaine sur la cible (souvent vers le sous-domaine www)
 		listTree=[]
+		extFile=['.php']
 
 		#Si la liste finale est vide, c'est la premiére itération sur le domaine, on teste la redirection
 		if (listeFin == []):
@@ -125,22 +125,26 @@ class Spider():
 				if (line[0] == '#'):
 					continue
 				line=line.strip('\n')
-				print(line)
+				#print(line)
 				#Si la liste finale n'est pas vide, ce n'est pas la premiére itération sur le domaine,
 				if (listeFin != []):
 					for dictio in listeFin[-1]:
 						for url,code in dictio.items():
-							if (code in [200, 403]):
-								#Avec les reecriture d'URL, on ne fait plus la difference entre fichier et dossier
+							#print(url[-4:])
+							if (code in [200, 403]) and (url[-4:] not in extFile):
+								#Detection des codes qui nous interesse et des fichiers qui vont renvoyer 200 a l'infini
+								
 								if (url[-1] != '/'):
 									url=url+'/'
 								result=self.requestBF(url+line)
 								self.codeFilter(result, listTree)
 				else:
 					result=self.requestBF(dom)
+				#print(result)
 				self.codeFilter(result, listTree)
 
 		listTree=self.processDoublons(listTree)
+		#print(listTree)
 		return listTree
 
 	def processDepthSpider(self, depth):

@@ -236,7 +236,7 @@ class Dnsenum():
                 if (line[0] == '#'):
                     continue
                 tryBF=line.strip('\n')
-                print(tryBF)
+                #print(tryBF)
                 try:
                     outputtryBF=subprocess.check_output('dig ' + tryBF + '.' + self.domain.url, stderr=subprocess.STDOUT, shell=True)
                 except:

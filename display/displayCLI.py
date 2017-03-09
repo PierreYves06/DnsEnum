@@ -9,17 +9,27 @@ class displayCLI(Thread):
 	"""Classe qui modelise l'affichage en console"""
 
 	
-	def __init__(self, dom, dictio='directories.jbrofuzz'):
+	def __init__(self, args, dictio='directories.jbrofuzz', depth=2):
 		"""
 			Initialisation avec demarrage du thread gerant la boucle d affichage, 
 			un objet Domain et un dictionnaire
 		"""
+		#print(args)
 		Thread.__init__(self)
 		self.running = False
+		dom=args['DOMAIN']
 		if (dom[:6] == 'http://'):
 			dom=dom[6:]
 		self.target=Domain(dom)
-		self.dictio=dictio
+		if (args['-d']):
+			self.dictio=args['-d']
+		else:
+			self.dictio=dictio
+		if (args['--depth']):
+			self.depth=int(args['--depth'])
+		else:
+			self.depth=depth
+		self.args=args
 
 	def parseListeDictio(self, liste):
 		"""Methode de lecture de la liste de dictionnaire"""
@@ -79,6 +89,7 @@ class displayCLI(Thread):
 
 	def lectureSpiderResponse(self, liste):
 		"""Methode de lecture des retours du Spider"""
+		#print(liste)
 		lvl=0
 		for item in liste:
 			lvl+=1
@@ -89,8 +100,8 @@ class displayCLI(Thread):
 				for key,value in dictio.items():
 					#print('Url : ' + key)
 					#print('Code : ' + str(value))
-					if (value == 200):
-						print(key)
+					if (value in [200,403]):
+						print(key + ' : ' + str(value))
 
 	def displayDnsEnum(self):
 		"""Methode d'affichage de l'enumeration DNS"""
@@ -137,8 +148,9 @@ class displayCLI(Thread):
 		"""Methode qui lance le Spider"""
 		spider=Spider(self.target, self.dictio)
 		print('Dictionnaire utilise : ' + self.dictio)
+		print('Profondeur du spider : ' + str(self.depth))
 		print('Brute-force de l\'arborescence en cours... ')
-		spider.processDepthSpider(4)
+		spider.processDepthSpider(self.depth)
 		self.lectureSpiderResponse(self.target.getArbo())
 
 	def enumSpider(self):
@@ -163,6 +175,18 @@ class displayCLI(Thread):
 		print('Bienvenue !')
 		while self.running:
 			print('Votre cible : ' + self.target.getUrl())
+			if (self.args['-e']) and (self.args['-s']):
+				self.enumSpider()
+				self.quitCLI()
+				continue
+			if (self.args['-e']):
+				self.enumSolo()
+				self.quitCLI()
+				continue
+			if (self.args['-s']):
+				self.spiderSolo()
+				self.quitCLI()
+				continue
 			print('Que désirez-vous faire ?\n1 - Enumeration DNS\n2 - Spider\n3 - Enumeration DNS + Spider\n4 - Exit')
 			choice=input('Votre choix ? : ')
 			try:
