@@ -1,7 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-import sys, time
+import sys, time, os
 from threading import Thread
 from dom.domain import *
 
@@ -30,6 +30,13 @@ class displayCLI(Thread):
 		else:
 			self.depth=depth
 		self.args=args
+
+	def writeResult(self, file, output):
+		if (os.path.exists(file)):
+			print('Il y a deja un fichier avec ce nom !')
+		f=open(file, 'a')
+		f.write(output)
+		f.close()
 
 	def decoratorTimerProcess(process):
 		def timerProcess(self):
@@ -60,20 +67,22 @@ class displayCLI(Thread):
 
 	def lectureOtherResponse(self, dictio, type):
 		"""Methode de lecture chelou"""
+		output=''
 		for key,value in dictio.items():
 
 			#Display ReverseDNS
 			if (type=='RD'):
-				print('IP : ' + key)
+				output+='IP : ' + key + '\n'
 			else:
 			#Display Brute-force subdomains
-				print('Sous-domaine : ' + key)
-			print('Resultat(s) : ')
+				output+='Sous-domaine : ' + key + '\n'
+			output+='Resultat(s) : \n'
 			if (isinstance(value, str)):
-				print(value)
+				output+=value+'\n'
 			else:
 				for item in value:
-					print(item)
+					output+=item+'\n'
+		return output
 
 	def lectureDigResponse(self, liste):
 		"""Methode de lecture des retours de dig"""
@@ -137,8 +146,10 @@ class displayCLI(Thread):
 			print('Reverse DNS de classe C en cours...')
 			dnsenum.processReverseDns()
 			print('Fait')
-			print('Resultat du reverse DNS de classe C :')
-			self.lectureOtherResponse(self.target.getReverseDNS(), 'RD')
+			print('Resultat du reverse DNS de classe C dans le fichier results/' + self.target.getUrl() + '_rev_dns.txt')
+			output=self.lectureOtherResponse(self.target.getReverseDNS(), 'RD')
+			self.writeResult('results/' + self.target.getUrl() + '_rev_dns.txt', output)
+			#print(output)
 		else:
 			print('Reverse DNS ignore')
 
@@ -149,7 +160,8 @@ class displayCLI(Thread):
 			print('Brute-force des sous-domaines en cours...')
 			dnsenum.processBFSubDomain()
 			print('Resultat du brute-force des sous domaines : ')
-			self.lectureOtherResponse(self.target.getSubDomain(), 'BF')
+			output=self.lectureOtherResponse(self.target.getSubDomain(), 'BF')
+			print(output)
 		else:
 			print('Brute-force des sous-domaines ignore')
 
@@ -165,7 +177,7 @@ class displayCLI(Thread):
 
 	def enumSpider(self):
 		"""Methode qui lance l'enumeration DNS et le Spider"""
-		print('EnumSpider')
+		#print('EnumSpider')
 		self.enumSolo()
 		self.spiderSolo()
 
