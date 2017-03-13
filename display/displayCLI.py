@@ -59,16 +59,17 @@ class displayCLI(Thread):
 
 	def parseListeDictio(self, liste):
 		"""Methode de lecture de la liste de dictionnaire"""
-		#print(liste)
+		output=''
 		if (isinstance(liste, str)):
-			print(liste.strip('"'))
+			output+=liste.strip('"') + '\n'
 		else:
 			for item in liste:
 				if (isinstance(item, str)):
-					print(item.strip('"'))
+					output+=item.strip('"') + '\n'
 				else:
 					for key,value in item.items():
-						print(key + ' : ' + value)
+						output+=key + ' : ' + value + '\n'
+		return output
 
 	def processResponseYN(self, response):
 		"""Methode qui traite les choix Oui/Non"""
@@ -102,50 +103,51 @@ class displayCLI(Thread):
 
 	def lectureDigResponse(self, liste):
 		"""Methode de lecture des retours de dig"""
+		output=''
 		if liste == []:
-			print('Pas de réponse')
+			output+='Pas de réponse\n'
 		else:
 			if (isinstance(liste, str)):
-				print(liste)
+				output+=liste + '\n'
 			else:
-				print('Reponse : ')
+				output+='Reponse :\n'
 				if (liste['ans'] == 'empty'):
-					print('Pas de réponse')
+					output+='Pas de réponse\n'
 				else:
-					self.parseListeDictio(liste['ans'])
+					output+=self.parseListeDictio(liste['ans'])
 
-				print('Informations additionnelles : ')
+				output+='Informations additionnelles :\n'
 				if (liste['add'] == 'empty'):
-					print('Pas d\'informations additionnelles')
+					output+='Pas d\'informations additionnelles\n'
 				else:
-					self.parseListeDictio(liste['add'])
+					output+=self.parseListeDictio(liste['add'])
+		return output
 
 	def lectureSpiderResponse(self, liste):
 		"""Methode de lecture des retours du Spider"""
-		#print(liste)
 		lvl=0
+		output=''
 		for item in liste:
 			lvl+=1
-			print('Niveau de l\'arbo : ' + str(lvl))
-			#print(item)
+			output+='Niveau de l\'arbo : ' + str(lvl) + '\n'
 			for dictio in item:
-				#print(dictio)
 				for key,value in dictio.items():
-					#print('Url : ' + key)
-					#print('Code : ' + str(value))
 					if (value in [200,403]):
-						print(key + ' : ' + str(value))
+						output+=key + ' : ' + str(value) + '\n'
+		return output
 
 	def displayDnsEnum(self):
 		"""Methode d'affichage de l'enumeration DNS"""
-		print('IP de la cible : ')
-		self.lectureDigResponse(self.target.getIP())
-		print('Nameserver de la cible : ')
-		self.lectureDigResponse(self.target.getNS())
-		print('Serveur mail de la cible : ')
-		self.lectureDigResponse(self.target.getMX())
-		print('Enregistrement TXT de la cible : ')
-		self.lectureDigResponse(self.target.getTXT())
+		output=''
+		output+='IP de la cible : \n'
+		output+=self.lectureDigResponse(self.target.getIP())
+		output+='Nameserver de la cible :\n'
+		output+=self.lectureDigResponse(self.target.getNS())
+		output+='Serveur mail de la cible :\n'
+		output+=self.lectureDigResponse(self.target.getMX())
+		output+='Enregistrement TXT de la cible :\n'
+		output+=self.lectureDigResponse(self.target.getTXT())
+		return output
 
 	@decoratorTimerProcess
 	def enumSolo(self):
@@ -154,7 +156,8 @@ class displayCLI(Thread):
 		print('Enumeration DNS en cours...')
 		dnsenum.processDig()
 		print('Fait')
-		self.displayDnsEnum()
+		output=self.displayDnsEnum()
+		print(output)
 
 		choice=input('Voulez vous effectuer un reverse DNS de classe C sur la cible ? (y/n) : ')
 		resp=self.processResponseYN(choice)
@@ -165,7 +168,6 @@ class displayCLI(Thread):
 			print('Resultat du reverse DNS de classe C dans le fichier results/' + self.target.getUrl() + '_rev_dns.txt')
 			output=self.lectureOtherResponse(self.target.getReverseDNS(), 'RD')
 			self.writeResult('results/' + self.target.getUrl() + '_rev_dns.txt', output)
-			#print(output)
 		else:
 			print('Reverse DNS ignore')
 
@@ -189,11 +191,11 @@ class displayCLI(Thread):
 		print('Profondeur du spider : ' + str(self.depth))
 		print('Brute-force de l\'arborescence en cours... ')
 		spider.processDepthSpider(self.depth)
-		self.lectureSpiderResponse(self.target.getArbo())
+		output=self.lectureSpiderResponse(self.target.getArbo())
+		print(output)
 
 	def enumSpider(self):
 		"""Methode qui lance l'enumeration DNS et le Spider"""
-		#print('EnumSpider')
 		self.enumSolo()
 		self.spiderSolo()
 
