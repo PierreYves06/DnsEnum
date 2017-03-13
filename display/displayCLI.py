@@ -32,13 +32,20 @@ class displayCLI(Thread):
 		self.args=args
 
 	def writeResult(self, file, output):
+		"""Methode d ecriture des resultats dans un fichier"""
 		if (os.path.exists(file)):
 			print('Il y a deja un fichier avec ce nom !')
-		f=open(file, 'a')
-		f.write(output)
-		f.close()
+			choice=input('Voulez-vous remplace ce fichier ? (y/n) : ')
+			resp=self.processResponseYN(choice)
+			if (resp):
+				f=open(file, 'w')
+				f.write(output)
+				f.close()
+			else:
+				print('Operation ignoree')
 
 	def decoratorTimerProcess(process):
+		"""Decorateur ajoutant un timer a un process"""
 		def timerProcess(self):
 			start=time.time()
 			process(self)
@@ -66,7 +73,7 @@ class displayCLI(Thread):
 			return False
 
 	def lectureOtherResponse(self, dictio, type):
-		"""Methode de lecture chelou"""
+		"""Methode de lecture variable"""
 		output=''
 		for key,value in dictio.items():
 
