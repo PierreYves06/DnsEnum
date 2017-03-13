@@ -3,3 +3,4 @@
 *.bak
 .git-old
 .gitignore
+results*

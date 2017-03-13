@@ -43,6 +43,10 @@ class displayCLI(Thread):
 				f.close()
 			else:
 				print('Operation ignoree')
+		else:
+			f=open(file, 'w')
+			f.write(output)
+			f.close()
 
 	def decoratorTimerProcess(process):
 		"""Decorateur ajoutant un timer a un process"""
@@ -55,12 +59,16 @@ class displayCLI(Thread):
 
 	def parseListeDictio(self, liste):
 		"""Methode de lecture de la liste de dictionnaire"""
+		#print(liste)
 		if (isinstance(liste, str)):
-			print(liste)
+			print(liste.strip('"'))
 		else:
 			for item in liste:
-				for key,value in item.items():
-					print(key + ' : ' + value)
+				if (isinstance(item, str)):
+					print(item.strip('"'))
+				else:
+					for key,value in item.items():
+						print(key + ' : ' + value)
 
 	def processResponseYN(self, response):
 		"""Methode qui traite les choix Oui/Non"""
@@ -76,7 +84,7 @@ class displayCLI(Thread):
 		"""Methode de lecture variable"""
 		output=''
 		for key,value in dictio.items():
-
+			output+='\n-----------------\n'
 			#Display ReverseDNS
 			if (type=='RD'):
 				output+='IP : ' + key + '\n'
@@ -89,6 +97,7 @@ class displayCLI(Thread):
 			else:
 				for item in value:
 					output+=item+'\n'
+			output+='-----------------\n'
 		return output
 
 	def lectureDigResponse(self, liste):
