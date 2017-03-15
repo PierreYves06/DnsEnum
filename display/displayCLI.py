@@ -61,11 +61,11 @@ class displayCLI(Thread):
 
 	def decoratorTimerProcess(process):
 		"""Decorateur ajoutant un timer a un process"""
-		def timerProcess(self):
+		def timerProcess(self, name):
 			start=time.time()
 			process(self)
 			interval=time.time() - start
-			print('\nTemps d execution : ' + str(round(interval, 2)) + ' sec.')
+			print('\nTemps d execution ' + name + ' : ' + str(round(interval, 2)) + ' sec.')
 		return timerProcess
 
 	def verboseOnOff(self, output, file):
@@ -167,7 +167,7 @@ class displayCLI(Thread):
 		return output
 
 	@decoratorTimerProcess
-	def enumSolo(self):
+	def enumSolo(self, name='Enumeration DNS'):
 		"""Methode qui lance l'enumeration DNS"""
 		dnsenum=Dnsenum(self.target, self.dictio)
 		print('Enumeration DNS en cours...')
@@ -209,7 +209,7 @@ class displayCLI(Thread):
 			print('Brute-force des sous-domaines ignore')
 
 	@decoratorTimerProcess
-	def spiderSolo(self):
+	def spiderSolo(self, name='Spider'):
 		"""Methode qui lance le Spider"""
 		spider=Spider(self.target, self.dictio)
 		print('Dictionnaire utilise : ' + self.dictio)
@@ -222,8 +222,8 @@ class displayCLI(Thread):
 
 	def enumSpider(self):
 		"""Methode qui lance l'enumeration DNS et le Spider"""
-		self.enumSolo()
-		self.spiderSolo()
+		self.enumSolo('Enumeration DNS')
+		self.spiderSolo('Spider')
 
 	def quitCLI(self):
 		"""Methode qui arrete le thread et quitte le CLI"""
@@ -246,11 +246,11 @@ class displayCLI(Thread):
 				self.quitCLI()
 				continue
 			if (self.args['-e']):
-				self.enumSolo()
+				self.enumSolo('Enumeration DNS')
 				self.quitCLI()
 				continue
 			if (self.args['-s']):
-				self.spiderSolo()
+				self.spiderSolo('Spider')
 				self.quitCLI()
 				continue
 			print('Que désirez-vous faire ?\n1 - Enumeration DNS\n2 - Spider\n3 - Enumeration DNS + Spider\n4 - Exit')
