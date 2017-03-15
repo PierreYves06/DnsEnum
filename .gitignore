@@ -3,5 +3,5 @@
 *.bak
 .git-old
 .gitignore
-results/*
-dic/test.txt
+results/$*
+*test.txt
