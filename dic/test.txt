@@ -4,9 +4,10 @@ adwords
 osef
 nawak
 wp-admin
-#wp-login.php
-#Test
-#index.php
+wp-login.php
+Test
+index.php
+index.html
 wp-content
 wp-includes
 plugins

@@ -33,6 +33,9 @@ class displayCLI(Thread):
 
 	def writeResult(self, file, output):
 		"""Methode d ecriture des resultats dans un fichier"""
+		#Verification de l'existence du dossier de la cible
+		if (os.path.exists('results/' + self.target.getUrl()) == False):
+			os.mkdir('results/' + self.target.getUrl())
 		if (os.path.exists(file)):
 			print('Il y a deja un fichier avec ce nom !')
 			choice=input('Voulez-vous remplace ce fichier ? (y/n) : ')
@@ -165,9 +168,9 @@ class displayCLI(Thread):
 			print('Reverse DNS de classe C en cours...')
 			dnsenum.processReverseDns()
 			print('Fait')
-			print('Resultat du reverse DNS de classe C dans le fichier results/' + self.target.getUrl() + '_rev_dns.txt')
+			print('Resultat du reverse DNS de classe C dans le fichier results/' + self.target.getUrl() + '/' + self.target.getUrl() + '_rev_dns.txt')
 			output=self.lectureOtherResponse(self.target.getReverseDNS(), 'RD')
-			self.writeResult('results/' + self.target.getUrl() + '_rev_dns.txt', output)
+			self.writeResult('results/' + self.target.getUrl() + '/' + self.target.getUrl() + '_rev_dns.txt', output)
 		else:
 			print('Reverse DNS ignore')
 
