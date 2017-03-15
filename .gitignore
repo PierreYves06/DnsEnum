@@ -4,4 +4,4 @@
 .git-old
 /results/*
 /dic/test.txt
-!/results/__init.py__
+!/results/__init__.py
