@@ -34,6 +34,8 @@ class displayCLI(Thread):
 	def writeResult(self, file, output):
 		"""Methode d ecriture des resultats dans un fichier"""
 		#Verification de l'existence du dossier de la cible
+		if (os.path.exists('results/') == False):
+			os.mkdir('results/')
 		if (os.path.exists('results/' + self.target.getUrl()) == False):
 			os.mkdir('results/' + self.target.getUrl())
 		if (os.path.exists(file)):
