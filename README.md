@@ -1,6 +1,5 @@
 # PenTesting Scout v1.0
                                
-TEST3
 Use it during recognition phase in web site's pentesting. This tool provides
 dns enumeration with class C's reverse DNS and subdomain's bruteforce.
 You can also use it to crawl web site's folder tree. This version is not finished
