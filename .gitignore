@@ -2,6 +2,5 @@
 *.py[oc]
 *.bak
 .git-old
-*.gitignore
-results/$*
-*test.txt
+/results/*
+/dic/test.txt
