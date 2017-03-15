@@ -29,6 +29,10 @@ class displayCLI(Thread):
 			self.depth=int(args['--depth'])
 		else:
 			self.depth=depth
+		if (args['-q']):
+			self.verbose=False
+		else:
+			self.verbose=True
 		self.args=args
 
 	def writeResult(self, file, output):
@@ -38,20 +42,22 @@ class displayCLI(Thread):
 			os.mkdir('results/')
 		if (os.path.exists('results/' + self.target.getUrl()) == False):
 			os.mkdir('results/' + self.target.getUrl())
-		if (os.path.exists(file)):
+		'''
+		if (os.path.exists('results/' + self.target.getUrl() + '/' + file)):
 			print('Il y a deja un fichier avec ce nom !')
 			choice=input('Voulez-vous remplace ce fichier ? (y/n) : ')
 			resp=self.processResponseYN(choice)
 			if (resp):
-				f=open(file, 'w')
+				f=open('results/' + self.target.getUrl() + '/' + file, 'w')
 				f.write(output)
 				f.close()
 			else:
 				print('Operation ignoree')
 		else:
-			f=open(file, 'w')
-			f.write(output)
-			f.close()
+		'''
+		f=open('results/' + self.target.getUrl() + '/' + file, 'w')
+		f.write(output)
+		f.close()
 
 	def decoratorTimerProcess(process):
 		"""Decorateur ajoutant un timer a un process"""
@@ -61,6 +67,12 @@ class displayCLI(Thread):
 			interval=time.time() - start
 			print('\nTemps d execution : ' + str(round(interval, 2)) + ' sec.')
 		return timerProcess
+
+	def verboseOnOff(self, output, file):
+		"""Methode qui gere le mode verbeux"""
+		if (self.verbose):
+			print(output)
+		self.writeResult(self.target.getUrl() + file, output)
 
 	def parseListeDictio(self, liste):
 		"""Methode de lecture de la liste de dictionnaire"""
@@ -162,29 +174,37 @@ class displayCLI(Thread):
 		dnsenum.processDig()
 		print('Fait')
 		output=self.displayDnsEnum()
-		print(output)
+		self.verboseOnOff(output, '_dnsenum.txt')
+		print('Resultat de l\'enumeration DNS dans le fichier results/' + self.target.getUrl() + '/' + self.target.getUrl() + '_dnsenum.txt')
 
-		choice=input('Voulez vous effectuer un reverse DNS de classe C sur la cible ? (y/n) : ')
-		resp=self.processResponseYN(choice)
+		if (self.args['-f']):
+			resp=True
+		else:
+			choice=input('Voulez vous effectuer un reverse DNS de classe C sur la cible ? (y/n) : ')
+			resp=self.processResponseYN(choice)
 		if (resp):
 			print('Reverse DNS de classe C en cours...')
 			dnsenum.processReverseDns()
 			print('Fait')
 			print('Resultat du reverse DNS de classe C dans le fichier results/' + self.target.getUrl() + '/' + self.target.getUrl() + '_rev_dns.txt')
 			output=self.lectureOtherResponse(self.target.getReverseDNS(), 'RD')
-			self.writeResult('results/' + self.target.getUrl() + '/' + self.target.getUrl() + '_rev_dns.txt', output)
+			self.writeResult(self.target.getUrl() + '_rev_dns.txt', output)
 		else:
 			print('Reverse DNS ignore')
 
-		choice=input('Voulez vous effectuer un brute-force des sous-domaines sur la cible ? (y/n) : ')
-		resp=self.processResponseYN(choice)
+		if (self.args['-f']):
+			resp=True
+		else:
+			choice=input('Voulez vous effectuer un brute-force des sous-domaines sur la cible ? (y/n) : ')
+			resp=self.processResponseYN(choice)
 		if (resp):
 			print('Dictionnaire utilise : ' + self.dictio)
 			print('Brute-force des sous-domaines en cours...')
 			dnsenum.processBFSubDomain()
-			print('Resultat du brute-force des sous domaines : ')
+			#print('Resultat du brute-force des sous domaines : ')
 			output=self.lectureOtherResponse(self.target.getSubDomain(), 'BF')
-			print(output)
+			self.verboseOnOff(output, '_bf_subdom.txt')
+			print('Resultat du brute-force des sous-domaines dans le fichier results/' + self.target.getUrl() + '/' + self.target.getUrl() + '_bf_subdom.txt')
 		else:
 			print('Brute-force des sous-domaines ignore')
 
@@ -197,7 +217,8 @@ class displayCLI(Thread):
 		print('Brute-force de l\'arborescence en cours... ')
 		spider.processDepthSpider(self.depth)
 		output=self.lectureSpiderResponse(self.target.getArbo())
-		print(output)
+		self.verboseOnOff(output, '_spider.txt')
+		print('Resultat du spider dans le fichier results/' + self.target.getUrl() + '/' + self.target.getUrl() + '_spider.txt')
 
 	def enumSpider(self):
 		"""Methode qui lance l'enumeration DNS et le Spider"""

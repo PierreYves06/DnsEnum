@@ -111,7 +111,7 @@ class Spider():
 					indexF=cle.find('?')
 					if (indexF != -1):
 						cle=cle[:indexF]
-					self.domain.setUrl(cle)
+					#self.domain.setUrl(cle)
 					break
 
 		#Debut du brute-force
