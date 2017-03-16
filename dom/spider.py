@@ -23,10 +23,15 @@ class Spider():
 
 	def processDoublons(self, liste):
 		"""Traitement des doublons dans les listes"""
-		listeProcess=[]
+		listeProcess = [] 
+		listKey = []
 		for i in liste:
 			if i not in listeProcess:
-				listeProcess.append(i)
+				for key, value in i.items():
+					if (value in [200, 403]) and (key not in listKey):
+						listeProcess.append(i)
+						listKey.append(key)
+		print(listeProcess)
 		return listeProcess
 
 	def codeFilter(self, dictResult, listeFiltered):
@@ -95,7 +100,7 @@ class Spider():
 		
 		#On verifie une eventuelle redirection de domaine sur la cible (souvent vers le sous-domaine www)
 		listTree=[]
-		extFile=['.php', '.html', '.txt', '.pdf', '.tar', '.gz', '.tar.gz', '.css', '.js', '.txt', '.asp', '.aspx', '.avi', '.bmp', '.bz', '.bz2', '.c', '.cc', '.cgi', '.conf', '.config', '.cp', '.py', '.csv', '.jpg', '.jpeg', '.png', '.mp3', '.mp4', '.divx', '.doc', '.docx', '.xls', '.xlsx', '.exe', '.swf', '.gif', '.htm', '.ico', '.inf', '.info', '.ini', '.iso', '.jar', '.jav', '.java', '.jsp', '.ksh', '.sh', '.bash', '.bat', '.bak', '.log', '.lua', '.mpeg', '.mpg', '.msf', '.odt', '.ova', '.ovf', '.pl', '.po', '.psd', '.rar', '.rb', '.rss', '.shtml', '.svg', '.ttf', '.vb', '.vdi', '.vmdk', '.wav', '.xhtml', '.xml', '.yml', '.zip', '.7z']
+		extFile=['.php', '.html', '.txt', '.sql', '.pdf', '.tar', '.gz', '.tar.gz', '.css', '.js', '.txt', '.asp', '.aspx', '.avi', '.bmp', '.bz', '.bz2', '.c', '.cc', '.cgi', '.conf', '.config', '.cp', '.py', '.csv', '.jpg', '.jpeg', '.png', '.mp3', '.mp4', '.divx', '.doc', '.docx', '.xls', '.xlsx', '.exe', '.swf', '.gif', '.htm', '.ico', '.inf', '.info', '.ini', '.iso', '.jar', '.jav', '.java', '.jsp', '.ksh', '.sh', '.bash', '.bat', '.bak', '.log', '.lua', '.mpeg', '.mpg', '.msf', '.odt', '.ova', '.ovf', '.pl', '.po', '.psd', '.rar', '.rb', '.rss', '.shtml', '.svg', '.ttf', '.vb', '.vdi', '.vmdk', '.wav', '.xhtml', '.xml', '.yml', '.zip', '.7z']
 
 		#Si la liste finale est vide, c'est la premiére itération sur le domaine, on teste la redirection
 		if (listeFin == []):
@@ -125,15 +130,11 @@ class Spider():
 				if (line[0] == '#'):
 					continue
 				line=line.strip('\n')
-				#print(line)
 				#Si la liste finale n'est pas vide, ce n'est pas la premiére itération sur le domaine,
 				if (listeFin != []):
 					for dictio in listeFin[-1]:
 						for url,code in dictio.items():
-							#print(url[-4:])
 							filename, file_ext=os.path.splitext(url)
-							#print(url)
-							#print(file_ext)
 							if (code in [200, 403]) and (file_ext not in extFile):
 								#Detection des codes qui nous interesse et des fichiers qui vont renvoyer 200 a l'infini
 								
@@ -143,11 +144,13 @@ class Spider():
 								self.codeFilter(result, listTree)
 				else:
 					result=self.requestBF(dom)
-				#print(result)
 				self.codeFilter(result, listTree)
 
 		listTree=self.processDoublons(listTree)
-		#print(listTree)
+		if (listeFin != []):
+			for dictio in listTree:
+				if dictio in listeFin[-1]:
+					del dictio
 		return listTree
 
 	def processDepthSpider(self, depth):

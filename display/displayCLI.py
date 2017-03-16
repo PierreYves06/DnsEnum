@@ -1,6 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
+from math import *
 import sys, time, os
 from threading import Thread
 from dom.domain import *
@@ -42,19 +43,6 @@ class displayCLI(Thread):
 			os.mkdir('results/')
 		if (os.path.exists('results/' + self.target.getUrl()) == False):
 			os.mkdir('results/' + self.target.getUrl())
-		'''
-		if (os.path.exists('results/' + self.target.getUrl() + '/' + file)):
-			print('Il y a deja un fichier avec ce nom !')
-			choice=input('Voulez-vous remplace ce fichier ? (y/n) : ')
-			resp=self.processResponseYN(choice)
-			if (resp):
-				f=open('results/' + self.target.getUrl() + '/' + file, 'w')
-				f.write(output)
-				f.close()
-			else:
-				print('Operation ignoree')
-		else:
-		'''
 		f=open('results/' + self.target.getUrl() + '/' + file, 'w')
 		f.write(output)
 		f.close()
@@ -65,7 +53,13 @@ class displayCLI(Thread):
 			start=time.time()
 			process(self)
 			interval=time.time() - start
-			print('\nTemps d execution ' + name + ' : ' + str(round(interval, 2)) + ' sec.')
+			if interval < 60:
+				print('\nTemps d execution ' + name + ' : ' + str(round(interval, 2)) + ' sec.')
+			else:
+				minutes=interval/60
+				seconds=interval%60
+				#print(interval)
+				print('\nTemps d execution ' + name + ' : ' + str(floor(minutes)) + ' min et ' + str(floor(seconds)) + ' sec.')
 		return timerProcess
 
 	def verboseOnOff(self, output, file):
