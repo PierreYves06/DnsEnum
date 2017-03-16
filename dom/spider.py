@@ -1,7 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-import time
+import time, os
 from urllib.request import Request, build_opener, URLError
 from http.client import HTTPConnection
 from lib import openanything
@@ -95,7 +95,7 @@ class Spider():
 		
 		#On verifie une eventuelle redirection de domaine sur la cible (souvent vers le sous-domaine www)
 		listTree=[]
-		extFile=['.php']
+		extFile=['.php', '.html', '.txt', '.pdf', '.tar', '.gz', '.tar.gz', '.css', '.js', '.txt', '.asp', '.aspx', '.avi', '.bmp', '.bz', '.bz2', '.c', '.cc', '.cgi', '.conf', '.config', '.cp', '.py', '.csv', '.jpg', '.jpeg', '.png', '.mp3', '.mp4', '.divx', '.doc', '.docx', '.xls', '.xlsx', '.exe', '.swf', '.gif', '.htm', '.ico', '.inf', '.info', '.ini', '.iso', '.jar', '.jav', '.java', '.jsp', '.ksh', '.sh', '.bash', '.bat', '.bak', '.log', '.lua', '.mpeg', '.mpg', '.msf', '.odt', '.ova', '.ovf', '.pl', '.po', '.psd', '.rar', '.rb', '.rss', '.shtml', '.svg', '.ttf', '.vb', '.vdi', '.vmdk', '.wav', '.xhtml', '.xml', '.yml', '.zip', '.7z']
 
 		#Si la liste finale est vide, c'est la premiére itération sur le domaine, on teste la redirection
 		if (listeFin == []):
@@ -131,7 +131,10 @@ class Spider():
 					for dictio in listeFin[-1]:
 						for url,code in dictio.items():
 							#print(url[-4:])
-							if (code in [200, 403]) and (url[-4:] not in extFile):
+							filename, file_ext=os.path.splitext(url)
+							#print(url)
+							#print(file_ext)
+							if (code in [200, 403]) and (file_ext not in extFile):
 								#Detection des codes qui nous interesse et des fichiers qui vont renvoyer 200 a l'infini
 								
 								if (url[-1] != '/'):
