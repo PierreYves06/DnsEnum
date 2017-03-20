@@ -31,7 +31,7 @@ class Spider():
 					if (value in [200, 403]) and (key not in listKey):
 						listeProcess.append(i)
 						listKey.append(key)
-		print(listeProcess)
+		#print(listeProcess)
 		return listeProcess
 
 	def codeFilter(self, dictResult, listeFiltered):
@@ -109,6 +109,7 @@ class Spider():
 				dom='http://' + self.domain.url
 			if (dom[-1] != '/'):
 				dom=dom + '/'
+			
 			result=self.requestBF(dom)
 			for cle,valeur in result.items():
 				#Si le code HTTP est 200 et que la liste result a plus d un element, c'est une redirection
@@ -116,9 +117,9 @@ class Spider():
 					indexF=cle.find('?')
 					if (indexF != -1):
 						cle=cle[:indexF]
-					#self.domain.setUrl(cle)
+					dom=cle
 					break
-
+			
 		#Debut du brute-force
 		with open(self.dictio, 'rb') as f:
 			for line in f:
@@ -137,21 +138,48 @@ class Spider():
 							filename, file_ext=os.path.splitext(url)
 							if (code in [200, 403]) and (file_ext not in extFile):
 								#Detection des codes qui nous interesse et des fichiers qui vont renvoyer 200 a l'infini
-								
+								if (code == 200):
+									#On vérifie que le troncon d url precedent n'est pas une 403
+									#Si c le cas on ne lance pas de requetes, cela entraine un code 200 a l'infini
+									testUrl=url.strip('/')
+									tabUrl=testUrl.split('/')
+									print(tabUrl)
+									del tabUrl[-1]
+									print(tabUrl)
 								if (url[-1] != '/'):
 									url=url+'/'
 								result=self.requestBF(url+line)
 								self.codeFilter(result, listTree)
+							else:
+								continue
 				else:
-					result=self.requestBF(dom)
-				self.codeFilter(result, listTree)
+					if (dom[-1] != '/'):
+						dom=dom+'/'
+					result=self.requestBF(dom+line)
+					self.codeFilter(result, listTree)
 
+		print('AVANT')
+		print(listTree)
 		listTree=self.processDoublons(listTree)
 		if (listeFin != []):
+			print('APRES DOUBLONS')
+			print(listTree)
+			print('LISTEFIN')
+			print(listeFin)
+			print('LISTEFIN -1')
+			print(listeFin[-1])
+			newListTree=[]
 			for dictio in listTree:
-				if dictio in listeFin[-1]:
-					del dictio
-		return listTree
+				print('DICTIO')
+				print(dictio)
+				if dictio not in listeFin[-1]:
+					newListTree.append(dictio)
+		else:
+			newListTree=listTree
+		print('APRES')
+		print(newListTree)
+		input('Continuer ?')
+		return newListTree
 
 	def processDepthSpider(self, depth):
 		"""Methode qui execute le processus de spider selon une profondeur donnée"""
