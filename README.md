@@ -20,7 +20,7 @@ or spider directly with corresponding arguments.
 
 ## Usage:
 
-    pentestingscout.py [-d NAME] [-es] [--depth=DEPTH] DOMAIN
+    pentestingscout.py [-d NAME] [-esqf] [--depth=DEPTH] DOMAIN
 
 ## Arguments:
     DOMAIN          website to be test
@@ -28,6 +28,8 @@ or spider directly with corresponding arguments.
 ## Options:
     -h --help       show this help message and exit
     --version       show version and exit
+    -q              Quiet mode
+    -f              Yes automatic to all questions
     -d NAME         name of your custom dictionnary, if not, directories.jbrofuzz
                     is used by default.This dictionnary must be in the 'dic' directory,
                     at the root of the application
