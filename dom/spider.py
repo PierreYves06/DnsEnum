@@ -141,11 +141,23 @@ class Spider():
 								if (code == 200):
 									#On vérifie que le troncon d url precedent n'est pas une 403
 									#Si c le cas on ne lance pas de requetes, cela entraine un code 200 a l'infini
-									testUrl=url.strip('/')
-									tabUrl=testUrl.split('/')
-									print(tabUrl)
+									#testUrl=url.strip('/')
+									tabUrl=(url.strip('/')).split('/')
+									#print(tabUrl)
 									del tabUrl[-1]
-									print(tabUrl)
+									#print(tabUrl)
+									if (len(tabUrl) > 2):
+										#testUrl=tabUrl[0] + '//' + tabUrl[1]
+										testUrl=tabUrl[0] + '//' + tabUrl[1] + ('/'.join(tabUrl[2:])) + '/'
+										#print(testUrl)
+										result=self.requestBF(testUrl)
+
+										#Une 403 renvoie toujours un dict avec 1 entree
+										if (len(result) == 1):
+											#print(result[testUrl])
+											if (result[testUrl] == 403):
+												continue
+										#print(result)
 								if (url[-1] != '/'):
 									url=url+'/'
 								result=self.requestBF(url+line)
@@ -158,27 +170,27 @@ class Spider():
 					result=self.requestBF(dom+line)
 					self.codeFilter(result, listTree)
 
-		print('AVANT')
-		print(listTree)
+		#print('AVANT')
+		#print(listTree)
 		listTree=self.processDoublons(listTree)
 		if (listeFin != []):
-			print('APRES DOUBLONS')
-			print(listTree)
-			print('LISTEFIN')
-			print(listeFin)
-			print('LISTEFIN -1')
-			print(listeFin[-1])
+			#print('APRES DOUBLONS')
+			#print(listTree)
+			#print('LISTEFIN')
+			#print(listeFin)
+			#print('LISTEFIN -1')
+			#print(listeFin[-1])
 			newListTree=[]
 			for dictio in listTree:
-				print('DICTIO')
-				print(dictio)
+				#print('DICTIO')
+				#print(dictio)
 				if dictio not in listeFin[-1]:
 					newListTree.append(dictio)
 		else:
 			newListTree=listTree
-		print('APRES')
-		print(newListTree)
-		input('Continuer ?')
+		#print('APRES')
+		#print(newListTree)
+		#input('Continuer ?')
 		return newListTree
 
 	def processDepthSpider(self, depth):
