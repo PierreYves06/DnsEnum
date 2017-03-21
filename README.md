@@ -2,15 +2,18 @@
                                
 Use it during recognition phase in web site's pentesting. This tool provides
 dns enumeration with class C's reverse DNS and subdomain's bruteforce.
-You can also use it to crawl web site's folder tree. This version is not finished
-yet but it works.
+You can also use it to crawl web site's folder tree.
  
 Be careful with sub domain's brute-force and spider, default
 dictionnary is huge and this may take time. By default, the spider is settled for
-1 level depth, change it in display/displayCLI.py line 126 but this may result of
+2 level depth, change this with the appropriate option but this may result of
 huge amount of HTTP request and possible problem with web's site's admin, even
 with the Law. In theory, this is fully legal because all collected informations
 are public but some sysadmins are nervous in front of log flood, be careful !
+
+Same thing for the default dictionnary (directories.jbrofuzz), moreover, and this is
+the application's weakness, spider and sub domain's brute-force sets a lot of time.
+Performance improvement is on top of my TODO list.
 
 By default, this application runs in interactive mode but you can launch dnsenum
 or spider directly with corresponding arguments.

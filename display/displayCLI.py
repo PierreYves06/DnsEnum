@@ -139,6 +139,9 @@ class displayCLI(Thread):
 		lvl=0
 		output=''
 		for item in liste:
+			if (item == []):
+				output+='Fin des resultats\n'
+				break
 			lvl+=1
 			output+='Niveau de l\'arbo : ' + str(lvl) + '\n'
 			for dictio in item:
