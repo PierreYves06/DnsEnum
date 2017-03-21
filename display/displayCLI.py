@@ -18,6 +18,8 @@ class displayCLI(Thread):
 		#print(args)
 		Thread.__init__(self)
 		self.running = False
+
+		#On parse les arguments fournis par l'utilisateur
 		dom=args['DOMAIN']
 		if (dom[:6] == 'http://'):
 			dom=dom[6:]
@@ -198,7 +200,6 @@ class displayCLI(Thread):
 			print('Dictionnaire utilise : ' + self.dictio)
 			print('Brute-force des sous-domaines en cours...')
 			dnsenum.processBFSubDomain()
-			#print('Resultat du brute-force des sous domaines : ')
 			output=self.lectureOtherResponse(self.target.getSubDomain(), 'BF')
 			self.verboseOnOff(output, '_bf_subdom.txt')
 			print('Resultat du brute-force des sous-domaines dans le fichier results/' + self.target.getUrl() + '/' + self.target.getUrl() + '_bf_subdom.txt')
@@ -209,6 +210,11 @@ class displayCLI(Thread):
 	def spiderSolo(self, name='Spider'):
 		"""Methode qui lance le Spider"""
 		spider=Spider(self.target, self.dictio)
+		choice=input('Voulez vous parser un eventuel robots.txt ? (y/n) : ')
+		resp=self.processResponseYN(choice)
+		if (resp):
+			print('Lecture du robots.txt...')
+			spider.readRobotsTxt(self.target.getUrl())
 		print('Dictionnaire utilise : ' + self.dictio)
 		print('Profondeur du spider : ' + str(self.depth))
 		print('Brute-force de l\'arborescence en cours... ')
@@ -238,6 +244,8 @@ class displayCLI(Thread):
 		print('Bienvenue !')
 		while self.running:
 			print('Votre cible : ' + self.target.getUrl())
+
+			#Selon les arguments fournis, on lance la fonctionnalite voulue
 			if (self.args['-e']) and (self.args['-s']):
 				self.enumSpider()
 				self.quitCLI()

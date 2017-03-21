@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import time, os
-from urllib.request import Request, build_opener, URLError
+from urllib.request import Request, build_opener, URLError, urlopen
 from http.client import HTTPConnection
 from lib import openanything
 
@@ -20,6 +20,11 @@ class Spider():
 
 	def setDictio(self, dictio):
 		self.dictio=dictio
+
+	def readRobotsTxt(self, dom):
+		#req = urllib.request.Request(dom+ '/robots.txt')
+		f = urlopen('http://' +dom+ '/robots.txt')
+		print(f.read().decode('utf-8'))
 
 	def processDoublons(self, liste):
 		"""Traitement des doublons dans les listes"""
@@ -54,6 +59,7 @@ class Spider():
 			result[url]=str(e.reason)
 			return result
 		code=testDataStream.status
+		#Si on trouve un code 400 ou 500, on a bien une erreur
 		if ((str(code))[0] == '4') or ((str(code))[0] == '5'):
 			result[url]=code
 			return result
@@ -163,6 +169,8 @@ class Spider():
 					self.codeFilter(result, listTree)
 
 		listTree=self.processDoublons(listTree)
+
+		#On compare la liste precedente a l'actuelle pour eliminer d eventuels doublons
 		if (listeFin != []):
 			newListTree=[]
 			for dictio in listTree:

@@ -5,7 +5,7 @@ import subprocess, os, sys
 import os, sys
 
 class Dnsenum():
-    "Classe qui modelise le processus de decouverte des sous-domaines"
+    """Classe qui modelise le processus de decouverte des sous-domaines"""
 
     #Methode init - Getters/Setters
     def __init__(self, domain, dictio='directories.jbrofuzz'):
@@ -20,6 +20,7 @@ class Dnsenum():
         self.dictio=dictio
 
     def processLine(self, line):
+        """Methode qui parse les lignes des resultats des requetes"""
         listLine=[]
         line = line.strip('\n')
         tabLine = line.split('\t')
