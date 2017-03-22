@@ -3,6 +3,7 @@
 
 from math import *
 import sys, time, os
+from colorama import init, Fore, Back, Style
 from threading import Thread
 from dom.domain import *
 
@@ -21,8 +22,10 @@ class displayCLI(Thread):
 
 		#On parse les arguments fournis par l'utilisateur
 		dom=args['DOMAIN']
-		if (dom[:6] == 'http://'):
-			dom=dom[6:]
+		if (dom[:7] == 'http://'):
+			dom=dom[7:]
+		if (dom[:8] == 'https://'):
+			dom=dom[8:]
 		self.target=Domain(dom)
 		if (args['-d']):
 			self.dictio=args['-d']
@@ -210,11 +213,20 @@ class displayCLI(Thread):
 	def spiderSolo(self, name='Spider'):
 		"""Methode qui lance le Spider"""
 		spider=Spider(self.target, self.dictio)
-		choice=input('Voulez vous parser un eventuel robots.txt ? (y/n) : ')
-		resp=self.processResponseYN(choice)
+
+		if (self.args['-f']):
+			resp=True
+		else:
+			choice=input('Voulez vous parser un eventuel robots.txt ? (y/n) : ')
+			resp=self.processResponseYN(choice)
 		if (resp):
 			print('Lecture du robots.txt...')
-			spider.readRobotsTxt(self.target.getUrl())
+			output=spider.readRobotsTxt(self.target.getUrl())
+			self.verboseOnOff(output, '_robots.txt')
+			print('Robots.txt sauvegarde dans le fichier results/' + self.target.getUrl() + '/' + self.target.getUrl() + '_robots.txt')
+		else:
+			print('Extraction du robots.txt ignore')
+
 		print('Dictionnaire utilise : ' + self.dictio)
 		print('Profondeur du spider : ' + str(self.depth))
 		print('Brute-force de l\'arborescence en cours... ')
@@ -241,9 +253,11 @@ class displayCLI(Thread):
 					'4': self.quitCLI,
 		}
 		self.running = True
-		print('Bienvenue !')
+		#Colorama start
+		init()
+		print(Fore.CYAN + Style.DIM + '\n\t\t\tPenTesting Scout v1.0' + Style.RESET_ALL + '\n')
 		while self.running:
-			print('Votre cible : ' + self.target.getUrl())
+			print('Votre cible : ' + Fore.RED + self.target.getUrl() + Style.RESET_ALL + '\n')
 
 			#Selon les arguments fournis, on lance la fonctionnalite voulue
 			if (self.args['-e']) and (self.args['-s']):
@@ -258,7 +272,11 @@ class displayCLI(Thread):
 				self.spiderSolo('Spider')
 				self.quitCLI()
 				continue
-			print('Que désirez-vous faire ?\n1 - Enumeration DNS\n2 - Spider\n3 - Enumeration DNS + Spider\n4 - Exit')
+			print('Que désirez-vous faire ?\n1 - '+ Fore.GREEN \
+					+'Enumeration DNS' + Style.RESET_ALL + '\n2'\
+					+ ' - '+ Fore.GREEN +'Spider' + Style.RESET_ALL\
+					+ '\n3 - '+ Fore.GREEN +'Enumeration DNS + Spider'\
+					+ Style.RESET_ALL + '\n4 - '+ Fore.GREEN +'Exit' + Style.RESET_ALL)
 			choice=input('Votre choix ? : ')
 			try:
 				options[choice]()

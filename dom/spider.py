@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import time, os
-from urllib.request import Request, build_opener, URLError, urlopen
+from urllib.request import Request, build_opener, URLError, urlopen, HTTPError
 from http.client import HTTPConnection
 from lib import openanything
 
@@ -22,9 +22,14 @@ class Spider():
 		self.dictio=dictio
 
 	def readRobotsTxt(self, dom):
-		#req = urllib.request.Request(dom+ '/robots.txt')
-		f = urlopen('http://' +dom+ '/robots.txt')
-		print(f.read().decode('utf-8'))
+		if (dom[:4] != 'http'):
+			dom='http://' + dom
+		try:
+			f = urlopen(dom + '/robots.txt')
+		except HTTPError as e:
+			output='Robots.txt inaccessible ou inexistant : ' + str(e.code) + ' ' + e.reason 
+			return output
+		return (f.read().decode('utf-8'))
 
 	def processDoublons(self, liste):
 		"""Traitement des doublons dans les listes"""
