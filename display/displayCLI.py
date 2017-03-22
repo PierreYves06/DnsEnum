@@ -126,7 +126,7 @@ class displayCLI(Thread):
 			if (isinstance(liste, str)):
 				output+=liste + '\n'
 			else:
-				output+='Reponse :\n'
+				#output+='Reponse :\n'
 				if (liste['ans'] == 'empty'):
 					output+='Pas de réponse\n'
 				else:
@@ -158,13 +158,13 @@ class displayCLI(Thread):
 	def displayDnsEnum(self):
 		"""Methode d'affichage de l'enumeration DNS"""
 		output=''
-		output+='IP de la cible : \n'
+		output+=Fore.CYAN + '\nIP de la cible :' + Style.RESET_ALL + '\n'
 		output+=self.lectureDigResponse(self.target.getIP())
-		output+='Nameserver de la cible :\n'
+		output+=Fore.CYAN + '\nNameserver de la cible :' + Style.RESET_ALL + '\n'
 		output+=self.lectureDigResponse(self.target.getNS())
-		output+='Serveur mail de la cible :\n'
+		output+=Fore.CYAN + '\nServeur mail de la cible :' + Style.RESET_ALL + '\n'
 		output+=self.lectureDigResponse(self.target.getMX())
-		output+='Enregistrement TXT de la cible :\n'
+		output+=Fore.CYAN + '\nEnregistrement TXT de la cible :' + Style.RESET_ALL + '\n'
 		output+=self.lectureDigResponse(self.target.getTXT())
 		return output
 
@@ -255,9 +255,9 @@ class displayCLI(Thread):
 		self.running = True
 		#Colorama start
 		init()
-		print(Fore.CYAN + Style.DIM + '\n\t\t\tPenTesting Scout v1.0' + Style.RESET_ALL + '\n')
+		print(Fore.CYAN + '\n\t\t\tPenTesting Scout v1.0' + Style.RESET_ALL + '\n')
 		while self.running:
-			print('Votre cible : ' + Fore.RED + self.target.getUrl() + Style.RESET_ALL + '\n')
+			print('Votre cible : ' + Fore.MAGENTA + self.target.getUrl() + Style.RESET_ALL + '\n')
 
 			#Selon les arguments fournis, on lance la fonctionnalite voulue
 			if (self.args['-e']) and (self.args['-s']):
@@ -272,13 +272,18 @@ class displayCLI(Thread):
 				self.spiderSolo('Spider')
 				self.quitCLI()
 				continue
-			print('Que désirez-vous faire ?\n1 - '+ Fore.GREEN \
-					+'Enumeration DNS' + Style.RESET_ALL + '\n2'\
+			print('Que désirez-vous faire ?\n\n\t1 - '+ Fore.GREEN \
+					+'Enumeration DNS' + Style.RESET_ALL + '\n\t2'\
 					+ ' - '+ Fore.GREEN +'Spider' + Style.RESET_ALL\
-					+ '\n3 - '+ Fore.GREEN +'Enumeration DNS + Spider'\
-					+ Style.RESET_ALL + '\n4 - '+ Fore.GREEN +'Exit' + Style.RESET_ALL)
+					+ '\n\t3 - '+ Fore.GREEN +'Enumeration DNS + Spider'\
+					+ Style.RESET_ALL + '\n\t4 - '+ Fore.GREEN +'Exit' + Style.RESET_ALL + '\n')
 			choice=input('Votre choix ? : ')
 			try:
-				options[choice]()
+				if (choice == '1'):
+					options[choice]('Enumeration DNS')
+				elif (choice == '2'):
+					options[choice]('Spider')
+				else:
+					options[choice]()
 			except KeyError as e:
 				print(choice + ' : Choix inconnu')

@@ -24,6 +24,7 @@ class Spider():
 	def readRobotsTxt(self, dom):
 		if (dom[:4] != 'http'):
 			dom='http://' + dom
+			print(dom)
 		try:
 			f = urlopen(dom + '/robots.txt')
 		except HTTPError as e:
