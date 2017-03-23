@@ -13,14 +13,13 @@ class displayCLI(Thread):
 	
 	def __init__(self, args, dictio='directories.jbrofuzz', depth=2):
 		"""
-			Initialisation avec demarrage du thread managing display loop, 
-			Domain's object and a dictionary
+			Initialization with starting up of the thread handling the display's loop, 
+			a Domain's object and a dictionary
 		"""
-		#print(args)
 		Thread.__init__(self)
 		self.running = False
 
-		#On parse les arguments fournis par l'utilisateur
+		#Parsing arguments provided by the user
 		dom=args['DOMAIN']
 		if (dom[:7] == 'http://'):
 			dom=dom[7:]
@@ -42,8 +41,8 @@ class displayCLI(Thread):
 		self.args=args
 
 	def writeResult(self, file, output):
-		"""Methode d ecriture des resultats dans un fichier"""
-		#Verification de l'existence du dossier de la cible
+		"""Method for writing results in a file"""
+		#Existence's verification of target's directory
 		if (os.path.exists('results/') == False):
 			os.mkdir('results/')
 		if (os.path.exists('results/' + self.target.getUrl()) == False):
@@ -53,27 +52,27 @@ class displayCLI(Thread):
 		f.close()
 
 	def decoratorTimerProcess(process):
-		"""Decorateur ajoutant un timer a un process"""
+		"""Decorator which adds a timer to a process"""
 		def timerProcess(self, name):
 			start=time.time()
 			process(self)
 			interval=time.time() - start
 			if interval < 60:
-				print('\n' + Fore.YELLOW + 'Temps d execution ' + name + ' : ' + str(round(interval, 2)) + ' sec.' + Style.RESET_ALL)
+				print('\n' + Fore.YELLOW + 'Execution time ' + name + ' : ' + str(round(interval, 2)) + ' sec.' + Style.RESET_ALL)
 			else:
 				minutes=interval/60
 				seconds=interval%60
-				print('\n' + Fore.YELLOW + 'Temps d execution ' + name + ' : ' + str(floor(minutes)) + ' min et ' + str(floor(seconds)) + ' sec.' + Style.RESET_ALL)
+				print('\n' + Fore.YELLOW + 'Execution time ' + name + ' : ' + str(floor(minutes)) + ' min and ' + str(floor(seconds)) + ' sec.' + Style.RESET_ALL)
 		return timerProcess
 
 	def verboseOnOff(self, output, file):
-		"""Methode qui gere le mode verbeux"""
+		"""Method which handles verbose mode"""
 		if (self.verbose):
 			print(output)
 		self.writeResult(self.target.getUrl() + file, output)
 
 	def parseListeDictio(self, liste):
-		"""Methode de lecture de la liste de dictionnaire"""
+		"""Method for reading dictionary's list"""
 		output=''
 		if (isinstance(liste, str)):
 			output+=liste.strip('"') + '\n'
@@ -87,17 +86,17 @@ class displayCLI(Thread):
 		return output
 
 	def processResponseYN(self, response):
-		"""Methode qui traite les choix Oui/Non"""
+		"""Method which handles choices Yes/No"""
 		while (response != 'y') and (response != 'n'):
-			print(Fore.RED + choice + ' : Choix inconnu' + Style.RESET_ALL)
-			response=input(Style.BRIGHT + 'Faites un nouveau choix svp (y/n) : ' + Style.RESET_ALL)
+			print(Fore.RED + choice + ' : Unknown Choice' + Style.RESET_ALL)
+			response=input(Style.BRIGHT + 'Make a new choice please(y/n) : ' + Style.RESET_ALL)
 		if (response == 'y'):
 			return True
 		else:
 			return False
 
 	def lectureOtherResponse(self, dictio, type):
-		"""Methode de lecture variable"""
+		"""Method for reading and display ReverseDNS and subdomain's bruteforce"""
 		output=''
 		for key,value in dictio.items():
 			output+='\n' + (40*'-') + '\n'
@@ -105,9 +104,9 @@ class displayCLI(Thread):
 			if (type=='RD'):
 				output+='IP : ' + key + '\n'
 			else:
-			#Display Brute-force subdomains
-				output+='Sous-domaine : ' + key + '\n'
-			output+='Resultat(s) : \n'
+			#Display subdomain's bruteforce
+				output+='Subdomain : ' + key + '\n'
+			output+='Result(s) : \n'
 			if (isinstance(value, str)):
 				output+=value+'\n'
 			else:
@@ -117,37 +116,36 @@ class displayCLI(Thread):
 		return output
 
 	def lectureDigResponse(self, liste):
-		"""Methode de lecture des retours de dig"""
+		"""Method for reading dig's return"""
 		output=''
 		if liste == []:
-			output+='Pas de réponse\n'
+			output+='No response\n'
 		else:
 			if (isinstance(liste, str)):
 				output+=liste + '\n'
 			else:
-				#output+='Reponse :\n'
 				if (liste['ans'] == 'empty'):
-					output+='Pas de réponse\n'
+					output+='No response\n'
 				else:
 					output+=self.parseListeDictio(liste['ans'])
 
-				output+='Informations additionnelles :\n'
+				output+='Additional information:\n'
 				if (liste['add'] == 'empty'):
-					output+='Pas d\'informations additionnelles\n'
+					output+='No additional information\n'
 				else:
 					output+=self.parseListeDictio(liste['add'])
 		return output
 
 	def lectureSpiderResponse(self, liste):
-		"""Methode de lecture des retours du Spider"""
+		"""Method for reading Spider's return"""
 		lvl=0
 		output=''
 		for item in liste:
 			if (item == []):
-				output+='Fin des resultats\n'
+				output+='Result\'s end\n'
 				break
 			lvl+=1
-			output+='Niveau de l\'arbo : ' + str(lvl) + '\n'
+			output+='Tree structure\'s level : ' + str(lvl) + '\n'
 			for dictio in item:
 				for key,value in dictio.items():
 					if (value in [200,403]):
@@ -155,98 +153,95 @@ class displayCLI(Thread):
 		return output
 
 	def displayDnsEnum(self):
-		"""Methode d'affichage de l'enumeration DNS"""
+		"""Display's method of DNS's enumeration"""
 		output=''
-		output+='\nIP de la cible :\n'
+		output+='\nTarget\'s IP :\n'
 		output+=self.lectureDigResponse(self.target.getIP())
-		output+='\nNameserver de la cible :\n'
+		output+='\nTarget\'s nameserver :\n'
 		output+=self.lectureDigResponse(self.target.getNS())
-		output+='\nServeur mail de la cible :\n'
+		output+='\nMail\'s server of the target :\n'
 		output+=self.lectureDigResponse(self.target.getMX())
-		output+='\nEnregistrement TXT de la cible :\n'
+		output+='\nTXT\'s record of the target :\n'
 		output+=self.lectureDigResponse(self.target.getTXT())
 		return output
 
 	@decoratorTimerProcess
-	def enumSolo(self, name='Enumeration DNS'):
-		"""Methode qui lance l'enumeration DNS"""
+	def enumSolo(self, name='DNS\'s enumeration'):
+		"""Method which launches DNS's enumeration"""
 		dnsenum=Dnsenum(self.target, self.dictio)
-		print(Style.BRIGHT + 'Enumeration DNS en cours...' + Style.RESET_ALL)
+		print(Style.BRIGHT + 'DNS\'s enumeration in progress...' + Style.RESET_ALL)
 		dnsenum.processDig()
-		#print('Fait')
 		output=self.displayDnsEnum()
 		self.verboseOnOff(output, '_dnsenum.txt')
-		print('Resultat de l\'enumeration DNS dans le fichier results/' + self.target.getUrl() + '/' + self.target.getUrl() + '_dnsenum.txt')
+		print('Result of the DNS\'s enumeration in the file results/' + self.target.getUrl() + '/' + self.target.getUrl() + '_dnsenum.txt')
 
 		if (self.args['-f']):
 			resp=True
 		else:
-			choice=input('Voulez vous effectuer un reverse DNS de classe C sur la cible ? (y/n) : ')
+			choice=input('Do you want to make a reverse DNS of C class on the target ? (y/n) : ')
 			resp=self.processResponseYN(choice)
 		if (resp):
-			print(Style.BRIGHT + 'Reverse DNS de classe C en cours...' + Style.RESET_ALL)
+			print(Style.BRIGHT + 'Reverse DNS of C class in progress...' + Style.RESET_ALL)
 			dnsenum.processReverseDns()
-			#print('Fait')
-			print('Resultat du reverse DNS de classe C dans le fichier results/' + self.target.getUrl() + '/' + self.target.getUrl() + '_rev_dns.txt')
+			print('Result of the reverse DNS of C class in the file results/' + self.target.getUrl() + '/' + self.target.getUrl() + '_rev_dns.txt')
 			output=self.lectureOtherResponse(self.target.getReverseDNS(), 'RD')
 			self.writeResult(self.target.getUrl() + '_rev_dns.txt', output)
 		else:
-			print(Fore.RED + Style.BRIGHT + 'Reverse DNS ignore' + Style.RESET_ALL)
+			print(Fore.RED + Style.BRIGHT + 'Reverse DNS ignored' + Style.RESET_ALL)
 
 		if (self.args['-f']):
 			resp=True
 		else:
-			choice=input('Voulez vous effectuer un brute-force des sous-domaines sur la cible ? (y/n) : ')
+			choice=input('Do you want to make a subdomain\'s bruteforce to the target ? (y/n) : ')
 			resp=self.processResponseYN(choice)
 		if (resp):
-			print('Dictionnaire utilise : ' + Fore.MAGENTA + self.dictio + Style.RESET_ALL)
-			print(Style.BRIGHT + 'Brute-force des sous-domaines en cours...'+ Style.RESET_ALL)
+			print('Used dictionary : ' + Fore.MAGENTA + self.dictio + Style.RESET_ALL)
+			print(Style.BRIGHT + 'Subdomain\'s bruteforce in progress...'+ Style.RESET_ALL)
 			dnsenum.processBFSubDomain()
 			output=self.lectureOtherResponse(self.target.getSubDomain(), 'BF')
 			self.verboseOnOff(output, '_bf_subdom.txt')
-			print('Resultat du brute-force des sous-domaines dans le fichier results/' + self.target.getUrl() + '/' + self.target.getUrl() + '_bf_subdom.txt')
+			print('Result of subdomain\'s bruteforce in the file results/' + self.target.getUrl() + '/' + self.target.getUrl() + '_bf_subdom.txt')
 		else:
-			print(Fore.RED + Style.BRIGHT + 'Brute-force des sous-domaines ignore' + Style.RESET_ALL)
+			print(Fore.RED + Style.BRIGHT + 'Subdomain\'s bruteforce ignored' + Style.RESET_ALL)
 
 	@decoratorTimerProcess
 	def spiderSolo(self, name='Spider'):
-		"""Methode qui lance le Spider"""
+		"""Method which launches the Spider"""
 		spider=Spider(self.target, self.dictio)
 
 		if (self.args['-f']):
 			resp=True
 		else:
-			choice=input('Voulez vous parser un eventuel robots.txt ? (y/n) : ')
+			choice=input('Do you want to parse a possible robots.txt ? (y/n) : ')
 			resp=self.processResponseYN(choice)
 		if (resp):
-			print(Style.BRIGHT + 'Lecture du robots.txt...' + Style.RESET_ALL)
+			print(Style.BRIGHT + 'Reading robots.txt...' + Style.RESET_ALL)
 			output=spider.readRobotsTxt(self.target.getUrl())
-			#self.verboseOnOff(output, '_robots.txt')
 			self.writeResult(self.target.getUrl() + '_robots.txt', output)
-			print('Robots.txt sauvegarde dans le fichier results/' + self.target.getUrl() + '/' + self.target.getUrl() + '_robots.txt')
+			print('Robots.txt saved in the file results/' + self.target.getUrl() + '/' + self.target.getUrl() + '_robots.txt')
 		else:
-			print(Fore.RED + Style.BRIGHT + 'Extraction du robots.txt ignore' + Style.RESET_ALL)
+			print(Fore.RED + Style.BRIGHT + 'Parsing of robots.txt ignored' + Style.RESET_ALL)
 
-		print('Dictionnaire utilise : ' + Fore.MAGENTA + self.dictio + Style.RESET_ALL)
-		print('Profondeur du spider : ' + Fore.MAGENTA + str(self.depth) + Style.RESET_ALL)
-		print(Style.BRIGHT + 'Brute-force de l\'arborescence en cours... ' + Style.RESET_ALL)
+		print('Dictionary used : ' + Fore.MAGENTA + self.dictio + Style.RESET_ALL)
+		print('Spider\'s depth : ' + Fore.MAGENTA + str(self.depth) + Style.RESET_ALL)
+		print(Style.BRIGHT + 'Bruteforce of the tree structure in progress... ' + Style.RESET_ALL)
 		spider.processDepthSpider(self.depth)
 		output=self.lectureSpiderResponse(self.target.getArbo())
 		self.verboseOnOff(output, '_spider.txt')
-		print('Resultat du spider dans le fichier results/' + self.target.getUrl() + '/' + self.target.getUrl() + '_spider.txt')
+		print('Result of the spider in the file results/' + self.target.getUrl() + '/' + self.target.getUrl() + '_spider.txt')
 
 	def enumSpider(self):
-		"""Methode qui lance l'enumeration DNS et le Spider"""
-		self.enumSolo('Enumeration DNS')
+		"""Method which launches DNS's enumeration and Spider"""
+		self.enumSolo('DNS\'s enumeration')
 		self.spiderSolo('Spider')
 
 	def quitCLI(self):
-		"""Methode qui arrete le thread et quitte le CLI"""
+		"""Method which stops the thread and quit the CLI"""
 		print(Fore.CYAN + 'Bye !' + Style.RESET_ALL)
 		self.running = False
 
 	def run(self):
-		"""Methode run du Thread qui lance la boucle d'affichage"""
+		"""Method run of the Thread which launches display's loop"""
 		options={'1': self.enumSolo,
 					'2': self.spiderSolo,
 					'3': self.enumSpider,
@@ -257,7 +252,7 @@ class displayCLI(Thread):
 		init()
 		print(Fore.CYAN + '\n\t\t\tPenTesting Scout v1.0' + Style.RESET_ALL + '\n')
 		while self.running:
-			print('Votre cible : ' + Fore.MAGENTA + self.target.getUrl() + Style.RESET_ALL + '\n')
+			print('Your target : ' + Fore.MAGENTA + self.target.getUrl() + Style.RESET_ALL + '\n')
 
 			#Selon les arguments fournis, on lance la fonctionnalite voulue
 			if (self.args['-e']) and (self.args['-s']):
@@ -265,25 +260,25 @@ class displayCLI(Thread):
 				self.quitCLI()
 				continue
 			if (self.args['-e']):
-				self.enumSolo('Enumeration DNS')
+				self.enumSolo('DNS\'s enumeration')
 				self.quitCLI()
 				continue
 			if (self.args['-s']):
 				self.spiderSolo('Spider')
 				self.quitCLI()
 				continue
-			print('Que désirez-vous faire ?\n\n\t1 - '+ Fore.GREEN \
-					+'Enumeration DNS' + Style.RESET_ALL + '\n\t2'\
+			print('What do you want to do ?\n\n\t1 - '+ Fore.GREEN \
+					+'DNS\'s enumeration' + Style.RESET_ALL + '\n\t2'\
 					+ ' - '+ Fore.GREEN +'Spider' + Style.RESET_ALL\
-					+ '\n\t3 - '+ Fore.GREEN +'Enumeration DNS + Spider'\
+					+ '\n\t3 - '+ Fore.GREEN +'DNS\'s enumeration + Spider'\
 					+ Style.RESET_ALL + '\n\t4 - '+ Fore.GREEN +'Exit' + Style.RESET_ALL + '\n')
-			choice=input('Votre choix ? : ')
+			choice=input('Your choice ? : ')
 			try:
 				if (choice == '1'):
-					options[choice]('Enumeration DNS')
+					options[choice]('DNS\'s Enumeration')
 				elif (choice == '2'):
 					options[choice]('Spider')
 				else:
 					options[choice]()
 			except KeyError as e:
-				print(Fore.RED + choice + ' : Choix inconnu' + Style.RESET_ALL)
+				print(Fore.RED + choice + ' : Unknown choice' + Style.RESET_ALL)

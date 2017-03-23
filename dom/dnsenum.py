@@ -5,11 +5,11 @@ import subprocess, os, sys
 import os, sys
 
 class Dnsenum():
-    """Classe qui modelise le processus de decouverte des sous-domaines"""
+    """Class which models discovery's process of subdomains"""
 
-    #Methode init - Getters/Setters
+    #Init method - Getters/Setters
     def __init__(self, domain, dictio='directories.jbrofuzz'):
-        "Initialisee avec un objet Domain et un dictionnaire"
+        "Initialized with a Domain's object and a dictionary"
         self.dictio='dic/'+dictio
         self.domain=domain
 
@@ -20,7 +20,7 @@ class Dnsenum():
         self.dictio=dictio
 
     def processLine(self, line):
-        """Methode qui parse les lignes des resultats des requetes"""
+        """Method which parses results's line of requests"""
         listLine=[]
         line = line.strip('\n')
         tabLine = line.split('\t')
@@ -28,7 +28,7 @@ class Dnsenum():
             return tabLine[-1]
 
     def assignInfos(self, result):
-        "Methode qui assigne les infos aux divers enregistrements du dictionnaire retourne par la classe"
+        "Method which assigns informations to various dictionary's recordings returned by the class"
         dictInfos={}
         if (isinstance(result['ans'], str)):
             dictInfos['ans']=self.processLine(result['ans'])
@@ -50,7 +50,7 @@ class Dnsenum():
         return dictInfos
 
     def parseTab(self, tab, string, count=1):
-        "Methode qui parse le tableau envoye par readOutput()"
+        "Method which parses la liste sent by readOutput()"
         listSearch = []
         for (i, item) in enumerate(tab):
             test=item.find(string)
@@ -68,7 +68,7 @@ class Dnsenum():
         return listSearch
 
     def searchInFos(self, tab):
-        "Methode qui extrait les infos de la reponse envoye par dig"
+        "Methode which extracts response's informations sent by dig"
         dictSearch = {}
 
         #On parse une premiere fois pour decouper la reponse en section

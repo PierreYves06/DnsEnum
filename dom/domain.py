@@ -5,7 +5,7 @@ from dom.dnsenum import *
 from dom.spider import *
 
 class Domain:
-    "Classe qui modelise un domaine et les operations possibles sur ce dernier"
+    "Class which models a domain and possible operations on it"
     def __init__(self, url):
         self.url = url
 
