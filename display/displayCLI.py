@@ -3,17 +3,18 @@
 
 from math import *
 import sys, time, os
+from colorama import init, Fore, Back, Style
 from threading import Thread
 from dom.domain import *
 
 class displayCLI(Thread):
-	"""Classe qui modelise l'affichage en console"""
+	"""Class wich models CLI's display"""
 
 	
 	def __init__(self, args, dictio='directories.jbrofuzz', depth=2):
 		"""
-			Initialisation avec demarrage du thread gerant la boucle d affichage, 
-			un objet Domain et un dictionnaire
+			Initialisation avec demarrage du thread managing display loop, 
+			Domain's object and a dictionary
 		"""
 		#print(args)
 		Thread.__init__(self)
@@ -21,8 +22,10 @@ class displayCLI(Thread):
 
 		#On parse les arguments fournis par l'utilisateur
 		dom=args['DOMAIN']
-		if (dom[:6] == 'http://'):
-			dom=dom[6:]
+		if (dom[:7] == 'http://'):
+			dom=dom[7:]
+		if (dom[:8] == 'https://'):
+			dom=dom[8:]
 		self.target=Domain(dom)
 		if (args['-d']):
 			self.dictio=args['-d']
@@ -56,12 +59,11 @@ class displayCLI(Thread):
 			process(self)
 			interval=time.time() - start
 			if interval < 60:
-				print('\nTemps d execution ' + name + ' : ' + str(round(interval, 2)) + ' sec.')
+				print('\n' + Fore.YELLOW + 'Temps d execution ' + name + ' : ' + str(round(interval, 2)) + ' sec.' + Style.RESET_ALL)
 			else:
 				minutes=interval/60
 				seconds=interval%60
-				#print(interval)
-				print('\nTemps d execution ' + name + ' : ' + str(floor(minutes)) + ' min et ' + str(floor(seconds)) + ' sec.')
+				print('\n' + Fore.YELLOW + 'Temps d execution ' + name + ' : ' + str(floor(minutes)) + ' min et ' + str(floor(seconds)) + ' sec.' + Style.RESET_ALL)
 		return timerProcess
 
 	def verboseOnOff(self, output, file):
@@ -87,8 +89,8 @@ class displayCLI(Thread):
 	def processResponseYN(self, response):
 		"""Methode qui traite les choix Oui/Non"""
 		while (response != 'y') and (response != 'n'):
-			print(choice + ' : Choix inconnu')
-			response=input('Faites un nouveau choix svp (y/n) : ')
+			print(Fore.RED + choice + ' : Choix inconnu' + Style.RESET_ALL)
+			response=input(Style.BRIGHT + 'Faites un nouveau choix svp (y/n) : ' + Style.RESET_ALL)
 		if (response == 'y'):
 			return True
 		else:
@@ -98,7 +100,7 @@ class displayCLI(Thread):
 		"""Methode de lecture variable"""
 		output=''
 		for key,value in dictio.items():
-			output+='\n-----------------\n'
+			output+='\n' + (40*'-') + '\n'
 			#Display ReverseDNS
 			if (type=='RD'):
 				output+='IP : ' + key + '\n'
@@ -111,7 +113,7 @@ class displayCLI(Thread):
 			else:
 				for item in value:
 					output+=item+'\n'
-			output+='-----------------\n'
+			output+=(40*'-') + '\n'
 		return output
 
 	def lectureDigResponse(self, liste):
@@ -123,7 +125,7 @@ class displayCLI(Thread):
 			if (isinstance(liste, str)):
 				output+=liste + '\n'
 			else:
-				output+='Reponse :\n'
+				#output+='Reponse :\n'
 				if (liste['ans'] == 'empty'):
 					output+='Pas de réponse\n'
 				else:
@@ -155,13 +157,13 @@ class displayCLI(Thread):
 	def displayDnsEnum(self):
 		"""Methode d'affichage de l'enumeration DNS"""
 		output=''
-		output+='IP de la cible : \n'
+		output+='\nIP de la cible :\n'
 		output+=self.lectureDigResponse(self.target.getIP())
-		output+='Nameserver de la cible :\n'
+		output+='\nNameserver de la cible :\n'
 		output+=self.lectureDigResponse(self.target.getNS())
-		output+='Serveur mail de la cible :\n'
+		output+='\nServeur mail de la cible :\n'
 		output+=self.lectureDigResponse(self.target.getMX())
-		output+='Enregistrement TXT de la cible :\n'
+		output+='\nEnregistrement TXT de la cible :\n'
 		output+=self.lectureDigResponse(self.target.getTXT())
 		return output
 
@@ -169,9 +171,9 @@ class displayCLI(Thread):
 	def enumSolo(self, name='Enumeration DNS'):
 		"""Methode qui lance l'enumeration DNS"""
 		dnsenum=Dnsenum(self.target, self.dictio)
-		print('Enumeration DNS en cours...')
+		print(Style.BRIGHT + 'Enumeration DNS en cours...' + Style.RESET_ALL)
 		dnsenum.processDig()
-		print('Fait')
+		#print('Fait')
 		output=self.displayDnsEnum()
 		self.verboseOnOff(output, '_dnsenum.txt')
 		print('Resultat de l\'enumeration DNS dans le fichier results/' + self.target.getUrl() + '/' + self.target.getUrl() + '_dnsenum.txt')
@@ -182,14 +184,14 @@ class displayCLI(Thread):
 			choice=input('Voulez vous effectuer un reverse DNS de classe C sur la cible ? (y/n) : ')
 			resp=self.processResponseYN(choice)
 		if (resp):
-			print('Reverse DNS de classe C en cours...')
+			print(Style.BRIGHT + 'Reverse DNS de classe C en cours...' + Style.RESET_ALL)
 			dnsenum.processReverseDns()
-			print('Fait')
+			#print('Fait')
 			print('Resultat du reverse DNS de classe C dans le fichier results/' + self.target.getUrl() + '/' + self.target.getUrl() + '_rev_dns.txt')
 			output=self.lectureOtherResponse(self.target.getReverseDNS(), 'RD')
 			self.writeResult(self.target.getUrl() + '_rev_dns.txt', output)
 		else:
-			print('Reverse DNS ignore')
+			print(Fore.RED + Style.BRIGHT + 'Reverse DNS ignore' + Style.RESET_ALL)
 
 		if (self.args['-f']):
 			resp=True
@@ -197,27 +199,37 @@ class displayCLI(Thread):
 			choice=input('Voulez vous effectuer un brute-force des sous-domaines sur la cible ? (y/n) : ')
 			resp=self.processResponseYN(choice)
 		if (resp):
-			print('Dictionnaire utilise : ' + self.dictio)
-			print('Brute-force des sous-domaines en cours...')
+			print('Dictionnaire utilise : ' + Fore.MAGENTA + self.dictio + Style.RESET_ALL)
+			print(Style.BRIGHT + 'Brute-force des sous-domaines en cours...'+ Style.RESET_ALL)
 			dnsenum.processBFSubDomain()
 			output=self.lectureOtherResponse(self.target.getSubDomain(), 'BF')
 			self.verboseOnOff(output, '_bf_subdom.txt')
 			print('Resultat du brute-force des sous-domaines dans le fichier results/' + self.target.getUrl() + '/' + self.target.getUrl() + '_bf_subdom.txt')
 		else:
-			print('Brute-force des sous-domaines ignore')
+			print(Fore.RED + Style.BRIGHT + 'Brute-force des sous-domaines ignore' + Style.RESET_ALL)
 
 	@decoratorTimerProcess
 	def spiderSolo(self, name='Spider'):
 		"""Methode qui lance le Spider"""
 		spider=Spider(self.target, self.dictio)
-		choice=input('Voulez vous parser un eventuel robots.txt ? (y/n) : ')
-		resp=self.processResponseYN(choice)
+
+		if (self.args['-f']):
+			resp=True
+		else:
+			choice=input('Voulez vous parser un eventuel robots.txt ? (y/n) : ')
+			resp=self.processResponseYN(choice)
 		if (resp):
-			print('Lecture du robots.txt...')
-			spider.readRobotsTxt(self.target.getUrl())
-		print('Dictionnaire utilise : ' + self.dictio)
-		print('Profondeur du spider : ' + str(self.depth))
-		print('Brute-force de l\'arborescence en cours... ')
+			print(Style.BRIGHT + 'Lecture du robots.txt...' + Style.RESET_ALL)
+			output=spider.readRobotsTxt(self.target.getUrl())
+			#self.verboseOnOff(output, '_robots.txt')
+			self.writeResult(self.target.getUrl() + '_robots.txt', output)
+			print('Robots.txt sauvegarde dans le fichier results/' + self.target.getUrl() + '/' + self.target.getUrl() + '_robots.txt')
+		else:
+			print(Fore.RED + Style.BRIGHT + 'Extraction du robots.txt ignore' + Style.RESET_ALL)
+
+		print('Dictionnaire utilise : ' + Fore.MAGENTA + self.dictio + Style.RESET_ALL)
+		print('Profondeur du spider : ' + Fore.MAGENTA + str(self.depth) + Style.RESET_ALL)
+		print(Style.BRIGHT + 'Brute-force de l\'arborescence en cours... ' + Style.RESET_ALL)
 		spider.processDepthSpider(self.depth)
 		output=self.lectureSpiderResponse(self.target.getArbo())
 		self.verboseOnOff(output, '_spider.txt')
@@ -230,7 +242,7 @@ class displayCLI(Thread):
 
 	def quitCLI(self):
 		"""Methode qui arrete le thread et quitte le CLI"""
-		print('Bye !')
+		print(Fore.CYAN + 'Bye !' + Style.RESET_ALL)
 		self.running = False
 
 	def run(self):
@@ -241,9 +253,11 @@ class displayCLI(Thread):
 					'4': self.quitCLI,
 		}
 		self.running = True
-		print('Bienvenue !')
+		#Colorama start
+		init()
+		print(Fore.CYAN + '\n\t\t\tPenTesting Scout v1.0' + Style.RESET_ALL + '\n')
 		while self.running:
-			print('Votre cible : ' + self.target.getUrl())
+			print('Votre cible : ' + Fore.MAGENTA + self.target.getUrl() + Style.RESET_ALL + '\n')
 
 			#Selon les arguments fournis, on lance la fonctionnalite voulue
 			if (self.args['-e']) and (self.args['-s']):
@@ -258,9 +272,18 @@ class displayCLI(Thread):
 				self.spiderSolo('Spider')
 				self.quitCLI()
 				continue
-			print('Que désirez-vous faire ?\n1 - Enumeration DNS\n2 - Spider\n3 - Enumeration DNS + Spider\n4 - Exit')
+			print('Que désirez-vous faire ?\n\n\t1 - '+ Fore.GREEN \
+					+'Enumeration DNS' + Style.RESET_ALL + '\n\t2'\
+					+ ' - '+ Fore.GREEN +'Spider' + Style.RESET_ALL\
+					+ '\n\t3 - '+ Fore.GREEN +'Enumeration DNS + Spider'\
+					+ Style.RESET_ALL + '\n\t4 - '+ Fore.GREEN +'Exit' + Style.RESET_ALL + '\n')
 			choice=input('Votre choix ? : ')
 			try:
-				options[choice]()
+				if (choice == '1'):
+					options[choice]('Enumeration DNS')
+				elif (choice == '2'):
+					options[choice]('Spider')
+				else:
+					options[choice]()
 			except KeyError as e:
-				print(choice + ' : Choix inconnu')
+				print(Fore.RED + choice + ' : Choix inconnu' + Style.RESET_ALL)

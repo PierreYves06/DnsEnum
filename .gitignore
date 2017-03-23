@@ -1,7 +1,7 @@
 *__pycache__*
 *.py[oc]
 *.bak
-.git-old
+/.git-old/
 /results/*
 /dic/test.txt
 !/results/__init__.py
