@@ -254,7 +254,7 @@ class displayCLI(Thread):
 		while self.running:
 			print('Your target : ' + Fore.MAGENTA + self.target.getUrl() + Style.RESET_ALL + '\n')
 
-			#Selon les arguments fournis, on lance la fonctionnalite voulue
+			#According to provided arguments, we run the desired functionality
 			if (self.args['-e']) and (self.args['-s']):
 				self.enumSpider()
 				self.quitCLI()

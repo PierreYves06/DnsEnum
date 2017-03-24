@@ -7,11 +7,11 @@ from http.client import HTTPConnection
 from lib import openanything
 
 class Spider():
-	"""Classe qui modelise le processus de decouverte de l arborescence"""
+	"""Class wich models the process of tree structure's discovery"""
 	
-	#Methode init - Getter/Setter
+	#Init method - Getter/Setter
 	def __init__(self, domain, dictio='directories.jbrofuzz'):
-		"""Initialisee avec un objet Domain et un dictionnaire"""
+		"""Initialized with a Domain's object and a dictionary"""
 		self.dictio='dic/'+dictio
 		self.domain=domain
 
@@ -22,17 +22,18 @@ class Spider():
 		self.dictio=dictio
 
 	def readRobotsTxt(self, dom):
+		"""Method wich reads a possible robots.txt"""
 		if (dom[:4] != 'http'):
 			dom='http://' + dom
 		try:
 			f = urlopen(dom + '/robots.txt')
 		except HTTPError as e:
-			output='Robots.txt inaccessible ou inexistant : ' + str(e.code) + ' ' + e.reason 
+			output='Robots.txt unreachable or absent : ' + str(e.code) + ' ' + e.reason 
 			return output
 		return (f.read().decode('utf-8'))
 
 	def processDoublons(self, liste):
-		"""Traitement des doublons dans les listes"""
+		"""Processing of duplicate items in lists"""
 		listeProcess = [] 
 		listKey = []
 		for i in liste:
@@ -44,10 +45,10 @@ class Spider():
 		return listeProcess
 
 	def codeFilter(self, dictResult, listeFiltered):
-		"""Filtrage des codes HTTP qui nous interessent"""
+		"""Filter operation of the HTTP's codes which interests us"""
 		for cle,valeur in dictResult.items():
 			if (valeur in [200, 403]):
-				#On enleve les parametres d'Url eventuels
+				#Removing possible Url's parameters
 				indexF=cle.find('?')
 				if (indexF != -1):
 					dictResult[cle[:indexF]]=valeur
@@ -55,44 +56,44 @@ class Spider():
 				listeFiltered.append(dictResult)
 
 	def processHttpError(self, opener, request, result, url):
-		"""Traitement des erreurs d'URL mal formees et des codes 4** et 5**"""
+		"""Processing of errors from malformed's URL and 4** and 5** codes"""
 		testDataStream=''
 		try:
 			testDataStream = opener.open(request)
 		except URLError as e:
-			#Si erreur, il y a un probleme avec l'URL, on sort de la méthode
+			#If error, there's an issue with URL, we leave the method
 			result[url]=str(e.reason)
 			return result
 		code=testDataStream.status
-		#Si on trouve un code 400 ou 500, on a bien une erreur
+		#If we find 400 or 500 code, we have an HTTP's error
 		if ((str(code))[0] == '4') or ((str(code))[0] == '5'):
 			result[url]=code
 			return result
 
 	def requestBF(self, url):
-		"""Methode qui modelise les requetes de brute-force de l arborescence"""
+		"""Method which models structure tree's bruteforce's requests"""
 
 		result={}
 		requestInit=Request(url)
 
-		#On temporise entre chaque requete afin d'eviter les IDS anti DDOS un peu sensible
+		#We delay between each requests to avoid sensitive IDS or antiDDOS
 		time.sleep(1)
 
-		#Possibilite de rendre les requetes plus verbeuses en cas de probleme
+		#Possibility to make request more verboses if there's a problem
 		HTTPConnection.debuglevel = 0
 
-		#On instancie notre gestionnaire d'erreur et on lui passe la requete
+		#We instantiate our error handler and we provide it the request
 		openerErr = build_opener(openanything.DefaultErrorHandler())
 		self.processHttpError(openerErr, requestInit, result, url)
 		if (result != {}):
 			return result
 		
-		#On instancie ensuite notre opener traitant les redirections et on lui passe la requete 
+		#Then, we instantiate our opener handling redirections and we provide it the request 
 		openerRed = build_opener(openanything.SmartRedirectHandler())
 		f = openerRed.open(requestInit)
 		result[url]=f.status
 
-		#Si redirection, on recommence le traitement erreur+redirection sur la nouvelle URL jusqu'a obtenir un code HTTP 200
+		#If redirection, we start over the process error+redirection on the new URL until we obtain HTTP's code 200
 		if ((str(f.status))[0] == '3'):
 			codeRedir=0
 			while (codeRedir != 200):
@@ -106,13 +107,13 @@ class Spider():
 		return result
 
 	def processSpider(self, listeFin):
-		"""Methode qui brute-force l'arborescence de l'url de l objet Domain passe a la classe en utilisant le dictionnaire propriete de la classe"""
+		"""Method which bruteforces the tree structure of the Domain's object's url provided to the class, using dictionary provided to the class"""
 		
-		#On verifie une eventuelle redirection de domaine sur la cible (souvent vers le sous-domaine www)
+		#We check a possible domain's redirection on target (often redirect to www's subdomain)
 		listTree=[]
 		extFile=['.php', '.html', '.txt', '.sql', '.pdf', '.tar', '.gz', '.tar.gz', '.css', '.js', '.txt', '.asp', '.aspx', '.avi', '.bmp', '.bz', '.bz2', '.c', '.cc', '.cgi', '.conf', '.config', '.cp', '.py', '.csv', '.jpg', '.jpeg', '.png', '.mp3', '.mp4', '.divx', '.doc', '.docx', '.xls', '.xlsx', '.exe', '.swf', '.gif', '.htm', '.ico', '.inf', '.info', '.ini', '.iso', '.jar', '.jav', '.java', '.jsp', '.ksh', '.sh', '.bash', '.bat', '.bak', '.log', '.lua', '.mpeg', '.mpg', '.msf', '.odt', '.ova', '.ovf', '.pl', '.po', '.psd', '.rar', '.rb', '.rss', '.shtml', '.svg', '.ttf', '.vb', '.vdi', '.vmdk', '.wav', '.xhtml', '.xml', '.yml', '.zip', '.7z']
 
-		#Si la liste finale est vide, c'est la premiére itération sur le domaine, on teste la redirection
+		#If necessary, we rewrite the target provided for urllib's format
 		if (listeFin == []):
 			dom=self.domain.url
 			if (dom[:6] != 'http://'):
@@ -122,7 +123,7 @@ class Spider():
 			
 			result=self.requestBF(dom)
 			for cle,valeur in result.items():
-				#Si le code HTTP est 200 et que la liste result a plus d un element, c'est une redirection
+				#If HTTP's code is 200 and result's list has more than one element, this is a redirection
 				if (valeur == 200) and (len(result) > 1):
 					indexF=cle.find('?')
 					if (indexF != -1):
@@ -130,34 +131,34 @@ class Spider():
 					dom=cle
 					break
 			
-		#Debut du brute-force
+		#Start bruteforce
 		with open(self.dictio, 'rb') as f:
 			for line in f:
 				try:
 					line=line.decode('utf-8')
 				except UnicodeDecodeError:
 					continue
-				#Commentaire dans le dictionnaire
+				#Dictionnary's commentary
 				if (line[0] == '#'):
 					continue
 				line=line.strip('\n')
-				#Si la liste finale n'est pas vide, ce n'est pas la premiére itération sur le domaine,
+				#If final list is not empty, This is not the first iteration on the domain
 				if (listeFin != []):
 					for dictio in listeFin[-1]:
 						for url,code in dictio.items():
 							filename, file_ext=os.path.splitext(url)
 							if (code in [200, 403]) and (file_ext not in extFile):
-								#Detection des codes qui nous interesse et des fichiers qui vont renvoyer 200 a l'infini
+								#Detection of codes which interest us and files which may produce HTTP's code 200 infinitely
 								if (code == 200):
-									#On vérifie que le troncon d url precedent n'est pas une 403
-									#Si c le cas on ne lance pas de requetes, cela entraine un code 200 a l'infini
+									#We check that previous url's segment is not a 403
+									#If so, we don't launch requests, which may produce HTTP's code 200 infinitely
 									tabUrl=(url.strip('/')).split('/')
 									del tabUrl[-1]
 									if (len(tabUrl) > 2):
 										testUrl=tabUrl[0] + '//' + tabUrl[1] + ('/'.join(tabUrl[2:])) + '/'
 										result=self.requestBF(testUrl)
 
-										#Une 403 renvoie toujours un dict avec 1 entree
+										#A HTTP's error 403 produces always a dictionnary with 1 item
 										if (len(result) == 1):
 											if (result[testUrl] == 403):
 												continue
@@ -175,7 +176,7 @@ class Spider():
 
 		listTree=self.processDoublons(listTree)
 
-		#On compare la liste precedente a l'actuelle pour eliminer d eventuels doublons
+		#We compare previous list with the actual to eliminate possible duplicate items
 		if (listeFin != []):
 			newListTree=[]
 			for dictio in listTree:
@@ -186,7 +187,7 @@ class Spider():
 		return newListTree
 
 	def processDepthSpider(self, depth):
-		"""Methode qui execute le processus de spider selon une profondeur donnée"""
+		"""Method which runs spider's process according to provided depth"""
 		listTriFinal=[]
 		i=0
 		while (i < depth):

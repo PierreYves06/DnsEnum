@@ -56,12 +56,12 @@ class Dnsenum():
             test=item.find(string)
             if (test != -1):
                 if (count > 1):
-                    #Le tableau contient plus d'un resultat, on itere par rapport a count
+                    #If the list contains more than one result, we iterate on count
                     for j in range(1,count+1) :
                         response = tab[i+j]
                         listSearch.append(response)
                 else:
-                    #Un seul resultat, on l extrait et on le retourne
+                    #One result, we extract and return it
                     response = tab[i+1]
                     return response
 
@@ -71,7 +71,7 @@ class Dnsenum():
         "Methode which extracts response's informations sent by dig"
         dictSearch = {}
 
-        #On parse une premiere fois pour decouper la reponse en section
+        #We parse a first-timer to cut answer in section
         string = '->>HEADER<<-'
         response = self.parseTab(tab, string)
         tabResponse = response.split(',')
@@ -79,20 +79,20 @@ class Dnsenum():
         testAdd = int(tabResponse[3][-2])
         if (testAns != 0):
 
-            #On recupere les infos de la section ANSWER
+            #We retrieve informations ANSWER's section
             string = 'ANSWER SECTION'
             response = self.parseTab(tab, string, testAns)
             dictSearch['ans'] = response
         if (testAdd != 0):
 
-            #On recupere les infos de la section ADDITIONAL eventuellement
+            #We retrieve informations ADDITIONALs section, eventually
             string = 'ADDITIONAL SECTION'
             response = self.parseTab(tab, string, testAdd)
             dictSearch['add'] = response
         return dictSearch
 
     def readOutput(self, output):
-        "Methode qui recupere la sortie de dig et la traite selon les cas"
+        "Method which retrieves dig's output and deals with according to the case"
         f = open('tmp.txt', 'w')
         f.write(output.decode('utf-8'))
         f.close()
@@ -100,10 +100,10 @@ class Dnsenum():
         tabLines=f.readlines()
         f.close()
 
-        #Envoi vers la methode searchInfos pour extraction des infos
+        #Sending to searchInfos's method, to extract informations
         infos = self.searchInFos(tabLines)
         
-        #Si pas de reponse
+        #If no answer
         if (infos == {'add': []}):
             infos = 'No answer'
             subprocess.check_output(["rm", "tmp.txt"])
@@ -112,7 +112,7 @@ class Dnsenum():
         return infos
 
     def extractIP(self, info):
-        "Methode pour extraire les IP des enregitrements supplementaire (NS, MX, etc...)"
+        "Method which extract IPs of the additional recordings (NS, MX, etc...)"
         outputIP=subprocess.check_output('dig ' + info, shell=True)
         resultIP=self.readOutput(outputIP)
         resultIP=(self.processLine(resultIP['ans']))
@@ -120,31 +120,31 @@ class Dnsenum():
                 
 
     def processDig(self):
-        "Methode de lancement des operations dig de base"
+        "Method which launches basic dig's operations"
         allResult={}
 
-        #On recupere les sorties de la commande dig effectue sur l url de l objet Domain passe a la classe
+        #We retrieve outputs of dig's command, applyied to url of the Domain's object provided to the class
         outputG=subprocess.check_output('dig ' + self.domain.url, shell=True)
         outputNS=subprocess.check_output('dig ' + self.domain.url + ' ns', shell=True)
         outputMX=subprocess.check_output('dig ' + self.domain.url + ' mx', shell=True)
         outputTXT=subprocess.check_output('dig ' + self.domain.url + ' txt', shell=True)
 
-        #On traite les sorties avec les methodes dediees
+        #We process output with the dedicated methods
         resultG=self.readOutput(outputG)
         resultNS=self.readOutput(outputNS)
         resultMX=self.readOutput(outputMX)
         resultTXT=self.readOutput(outputTXT)
 
-        #On extrait les resultats et on les assignent à l'objet Domain passe a la classe
+        #We extract results and on assigned them to the Domain's object provided to the class
 
-        #Resultat General
+        #General result
         if (resultG != 'No answer'):
             infosG=self.assignInfos(resultG)
             self.domain.setIP(infosG['ans'])
         else:
             self.domain.setIP('No answer')
 
-        #Resultat Nameserver
+        #Nameserver result
         if (resultNS != 'No answer'):
             infosNS=self.assignInfos(resultNS)
             if (isinstance(infosNS['ans'], str)):
@@ -164,7 +164,7 @@ class Dnsenum():
         else:
             self.domain.setNS('No answer')
 
-        #Resultat MX
+        #MX result
         if (resultMX != 'No answer'):
             infosMX=self.assignInfos(resultMX)
             if (isinstance(infosMX['ans'], str)):
@@ -188,7 +188,7 @@ class Dnsenum():
         else:
             self.domain.setMX('No answer')
 
-		#Resultat TXT
+		#TXT result
         if (resultTXT != 'No answer'):
             infosTXT=self.assignInfos(resultTXT)
             self.domain.setTXT(infosTXT)
@@ -196,7 +196,7 @@ class Dnsenum():
             self.domain.setTXT('No answer')
     
     def processReverseDns(self):
-        "Methode qui effectue une recherche en reverse DNS sur le sous reseau de classe C de l'IP du domaine"
+        "Method which performs a reverse DNS's research on the C class's subnetwork of the domain's IP"
         IP=self.domain.getIP()
         dictRevDNS={}
         width = len(IP)
@@ -224,24 +224,20 @@ class Dnsenum():
         self.domain.setReverseDNS(dictRevDNS)
 
     def processBFSubDomain(self):
-        "Methode de brute force des sous-domaines eventuels base sur un dictionnaire"
+        "Method to bruteforce possible subdomains, based on a dictionary"
         dictBFSubDom={}
         with open(self.dictio, 'rb') as f:
             for line in f:
                 try:
                     line=line.decode('utf-8')
                 except UnicodeDecodeError:
-                    #print('UnicodeDecodeError')
-                    #input()
                     continue
                 if (line[0] == '#'):
                     continue
                 tryBF=line.strip('\n')
-                #print(tryBF)
                 try:
                     outputtryBF=subprocess.check_output('dig ' + tryBF + '.' + self.domain.url, stderr=subprocess.STDOUT, shell=True)
                 except:
-                    #print('Erreur Brute Force')
                     continue
                 resultTryBF=self.readOutput(outputtryBF)
                 if (resultTryBF != 'No answer'):
