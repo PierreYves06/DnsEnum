@@ -58,11 +58,17 @@ class displayCLI(Thread):
 			process(self)
 			interval=time.time() - start
 			if interval < 60:
-				print('\n' + Fore.YELLOW + 'Execution time ' + name + ' : ' + str(round(interval, 2)) + ' sec.' + Style.RESET_ALL)
-			else:
+				print('\n' + Fore.YELLOW + 'Execution time ' + name + ' : ' + str(round(interval, 2)) + ' sec(s).' + Style.RESET_ALL)
+			elif (60 < interval < 3600):
 				minutes=interval/60
 				seconds=interval%60
-				print('\n' + Fore.YELLOW + 'Execution time ' + name + ' : ' + str(floor(minutes)) + ' min and ' + str(floor(seconds)) + ' sec.' + Style.RESET_ALL)
+				print('\n' + Fore.YELLOW + 'Execution time ' + name + ' : ' + str(floor(minutes)) + ' min(s) and ' + str(floor(seconds)) + ' sec(s).' + Style.RESET_ALL)
+			else:
+				hours=interval/3600
+				rest=interval%3600
+				minutes=rest/60
+				seconds=rest%60
+				print('\n' + Fore.YELLOW + 'Execution time ' + name + ' : ' + str(floor(hours)) + ' hour(s) and ' + str(floor(minutes)) + ' min(s) and ' + str(floor(seconds)) + ' sec(s).' + Style.RESET_ALL)
 		return timerProcess
 
 	def verboseOnOff(self, output, file):
@@ -222,6 +228,12 @@ class displayCLI(Thread):
 		else:
 			print(Fore.RED + Style.BRIGHT + 'Parsing of robots.txt ignored' + Style.RESET_ALL)
 
+		if (not (self.args['--depth'])):
+			choice=input('Do you want to choose spider\'s depth (2 by default)? (y/n) : ')
+			resp=self.processResponseYN(choice)
+			if (resp):
+				newDepth=input('Depth of the spider (be careful, this may take a lot of time !)? : ')
+				self.depth=int(newDepth)
 		print('Dictionary used : ' + Fore.MAGENTA + self.dictio + Style.RESET_ALL)
 		print('Spider\'s depth : ' + Fore.MAGENTA + str(self.depth) + Style.RESET_ALL)
 		print(Style.BRIGHT + 'Bruteforce of the tree structure in progress... ' + Style.RESET_ALL)
@@ -248,8 +260,10 @@ class displayCLI(Thread):
 					'4': self.quitCLI,
 		}
 		self.running = True
+
 		#Colorama start
 		init()
+
 		print(Fore.CYAN + '\n\t\t\tPenTesting Scout v1.0' + Style.RESET_ALL + '\n')
 		while self.running:
 			print('Your target : ' + Fore.MAGENTA + self.target.getUrl() + Style.RESET_ALL + '\n')

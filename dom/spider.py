@@ -53,6 +53,10 @@ class Spider():
 				if (indexF != -1):
 					dictResult[cle[:indexF]]=valeur
 					del dictResult[cle]
+				indexF=cle.find('#')
+				if (indexF != -1):
+					dictResult[cle[:indexF]]=valeur
+					del dictResult[cle]
 				listeFiltered.append(dictResult)
 
 	def processHttpError(self, opener, request, result, url):

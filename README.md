@@ -20,7 +20,7 @@ or spider directly with corresponding arguments.
 
 ## Usage:
 
-    pentestingscout.py [-d NAME] [-esqf] [--depth=DEPTH] DOMAIN
+    python3 pentestingscout.py [-d NAME] [-esqf] [--depth=DEPTH] DOMAIN
 
 ## Arguments:
     DOMAIN          website to be test
