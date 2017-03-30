@@ -58,18 +58,33 @@ class displayCLI(Thread):
 			process(self)
 			interval=time.time() - start
 			if interval < 60:
-				print('\n' + Fore.YELLOW + 'Execution time ' + name + ' : ' + str(round(interval, 2)) + ' sec(s).' + Style.RESET_ALL)
+				self.custom_print('Execution time ' + name + ' : ' + str(round(interval, 2))\
+									+ ' sec(s).', Fore.YELLOW)
 			elif (60 < interval < 3600):
 				minutes=interval/60
 				seconds=interval%60
-				print('\n' + Fore.YELLOW + 'Execution time ' + name + ' : ' + str(floor(minutes)) + ' min(s) and ' + str(floor(seconds)) + ' sec(s).' + Style.RESET_ALL)
+				self.custom_print('Execution time ' + name + ' : '\
+									+ str(floor(minutes)) + ' min(s) and ' + str(floor(seconds))\
+									+ ' sec(s).', Fore.YELLOW)
 			else:
 				hours=interval/3600
 				rest=interval%3600
 				minutes=rest/60
 				seconds=rest%60
-				print('\n' + Fore.YELLOW + 'Execution time ' + name + ' : ' + str(floor(hours)) + ' hour(s) and ' + str(floor(minutes)) + ' min(s) and ' + str(floor(seconds)) + ' sec(s).' + Style.RESET_ALL)
+				self.custom_print('Execution time ' + name + ' : '\
+									+ str(floor(hours)) + ' hour(s) and ' + str(floor(minutes))\
+									+ ' min(s) and ' + str(floor(seconds)) + ' sec(s).', Fore.YELLOW)
 		return timerProcess
+
+	def decoratorColor(process):
+		"""Shell's colors decorator"""
+		def colorize(self, string, color):
+			print(color + process(self, string) + Style.RESET_ALL)
+		return colorize
+
+	@decoratorColor
+	def custom_print(self, string):
+		return string
 
 	def verboseOnOff(self, output, file):
 		"""Method which handles verbose mode"""
@@ -264,7 +279,7 @@ class displayCLI(Thread):
 		#Colorama start
 		init()
 
-		print(Fore.CYAN + '\n\t\t\tPenTesting Scout v1.0' + Style.RESET_ALL + '\n')
+		self.custom_print('\n\t\t\tPenTesting Scout v1.0\n', Fore.CYAN)
 		while self.running:
 			print('Your target : ' + Fore.MAGENTA + self.target.getUrl() + Style.RESET_ALL + '\n')
 

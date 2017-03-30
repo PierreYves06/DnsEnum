@@ -161,7 +161,7 @@ class Spider():
 									if (len(tabUrl) > 2):
 										testUrl=tabUrl[0] + '//' + tabUrl[1] + ('/'.join(tabUrl[2:])) + '/'
 										result=self.requestBF(testUrl)
-
+										
 										#A HTTP's error 403 produces always a dictionnary with 1 item
 										if (len(result) == 1):
 											if (result[testUrl] == 403):
@@ -169,6 +169,7 @@ class Spider():
 								if (url[-1] != '/'):
 									url=url+'/'
 								result=self.requestBF(url+line)
+								
 								self.codeFilter(result, listTree)
 							else:
 								continue
@@ -176,6 +177,7 @@ class Spider():
 					if (dom[-1] != '/'):
 						dom=dom+'/'
 					result=self.requestBF(dom+line)
+					
 					self.codeFilter(result, listTree)
 
 		listTree=self.processDoublons(listTree)
