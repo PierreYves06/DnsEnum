@@ -18,7 +18,7 @@ Performance improvement is on top of my TODO list.
 By default, this application runs in interactive mode but you can launch dnsenum
 or spider directly with corresponding arguments.
 
-##Requirements
+## Requirements
 
 You have to install docopt and colorama with pip3
 
