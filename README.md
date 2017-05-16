@@ -2,7 +2,7 @@
                                
 Use it during recognition phase in web site's pentesting. This tool provides
 dns enumeration with class C's reverse DNS and subdomain's bruteforce.
-You can also use it to crawl web site's folder tree. Test.
+You can also use it to crawl web site's folder tree.
  
 Be careful with sub domain's brute-force and spider, default
 dictionnary is huge and this may take time. By default, the spider is settled for
