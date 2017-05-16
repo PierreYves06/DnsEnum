@@ -18,6 +18,10 @@ Performance improvement is on top of my TODO list.
 By default, this application runs in interactive mode but you can launch dnsenum
 or spider directly with corresponding arguments.
 
+##Requirements
+
+You have to install docopt and colorama with pip3
+
 ## Usage:
 
     python3 pentestingscout.py [-d NAME] [-esqf] [--depth=DEPTH] DOMAIN
