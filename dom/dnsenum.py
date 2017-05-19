@@ -235,6 +235,9 @@ class Dnsenum():
                 if (line[0] == '#'):
                     continue
                 tryBF=line.strip('\n')
+                testSp=tryBF.find(' ')
+                if (testSp != -1):
+                    continue
                 try:
                     outputtryBF=subprocess.check_output('dig ' + tryBF + '.' + self.domain.url, stderr=subprocess.STDOUT, shell=True)
                 except:
@@ -251,4 +254,5 @@ class Dnsenum():
                             listBFSubDom.append(match)
                         dictBFSubDom[tryBF + '.' + self.domain.url]=listBFSubDom
             f.close()
+            print('nbTry=' + str(nbTry))
             self.domain.setSubDomain(dictBFSubDom)
