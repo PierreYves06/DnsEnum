@@ -254,5 +254,4 @@ class Dnsenum():
                             listBFSubDom.append(match)
                         dictBFSubDom[tryBF + '.' + self.domain.url]=listBFSubDom
             f.close()
-            print('nbTry=' + str(nbTry))
             self.domain.setSubDomain(dictBFSubDom)
