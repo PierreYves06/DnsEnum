@@ -3,6 +3,8 @@
 
 import subprocess, os, sys
 import os, sys
+#from lib.threadBF import ThreadBF
+import threading
 
 class Dnsenum():
     """Class which models discovery's process of subdomains"""
@@ -12,6 +14,7 @@ class Dnsenum():
         "Initialized with a Domain's object and a dictionary"
         self.dictio='dic/'+dictio
         self.domain=domain
+        self.chunkSubDom=[]
 
     def getDictio(self):
         return self.dictio
@@ -223,10 +226,18 @@ class Dnsenum():
             host+=1
         self.domain.setReverseDNS(dictRevDNS)
 
-    def processBFSubDomain(self):
+    def processBFSubDomain(self, dictio):
         "Method to bruteforce possible subdomains, based on a dictionary"
         dictBFSubDom={}
-        with open(self.dictio, 'rb') as f:
+
+        #t1=ThreadBF('Test1')
+        #t2=ThreadBF('Test2')
+        #t1.start()
+        #t2.start()
+        #t1.join()
+        #t2.join()
+
+        with open(dictio, 'rb') as f:
             for line in f:
                 try:
                     line=line.decode('utf-8')
@@ -235,6 +246,7 @@ class Dnsenum():
                 if (line[0] == '#'):
                     continue
                 tryBF=line.strip('\n')
+                #print(tryBF)
                 testSp=tryBF.find(' ')
                 if (testSp != -1):
                     continue
@@ -242,6 +254,7 @@ class Dnsenum():
                     outputtryBF=subprocess.check_output('dig ' + tryBF + '.' + self.domain.url, stderr=subprocess.STDOUT, shell=True)
                 except:
                     continue
+                #print(outputtryBF)
                 resultTryBF=self.readOutput(outputtryBF)
                 if (resultTryBF != 'No answer'):
                     if isinstance(resultTryBF['ans'], str):
@@ -254,4 +267,16 @@ class Dnsenum():
                             listBFSubDom.append(match)
                         dictBFSubDom[tryBF + '.' + self.domain.url]=listBFSubDom
             f.close()
-            self.domain.setSubDomain(dictBFSubDom)
+            self.chunkSubDom.append(dictBFSubDom)
+            #self.domain.setSubDomain(dictBFSubDom)
+
+    def launchThreadBF(self):
+        dictFinalBFSubDom={}
+        t1=threading.Thread(None, self.processBFSubDomain, None, (self.dictio,))
+        #t2=threading.Thread(None, self.processBFSubDomain)
+        t1.start()
+        t1.join()
+        for item in self.chunkSubDom:
+            for key,value in item.items():
+                dictFinalBFSubDom[key]=value
+        self.domain.setSubDomain(dictFinalBFSubDom)

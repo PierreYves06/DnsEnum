@@ -5,3 +5,6 @@
 /results/*
 /dic/test.txt
 !/results/__init__.py
+.google.com
+.pierreyvescognac.fr
+tmp.txt
