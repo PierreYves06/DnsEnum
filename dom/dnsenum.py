@@ -1,10 +1,10 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-import subprocess, os, sys
+import subprocess, os, sys, math
 import os, sys
-#from lib.threadBF import ThreadBF
 import threading
+from random import *
 
 class Dnsenum():
     """Class which models discovery's process of subdomains"""
@@ -96,10 +96,11 @@ class Dnsenum():
 
     def readOutput(self, output):
         "Method which retrieves dig's output and deals with according to the case"
-        f = open('tmp.txt', 'w')
+        nameFile=str(random())[2:]
+        f = open(nameFile, 'w')
         f.write(output.decode('utf-8'))
         f.close()
-        f = open('tmp.txt', 'r')
+        f = open(nameFile, 'r')
         tabLines=f.readlines()
         f.close()
 
@@ -109,9 +110,9 @@ class Dnsenum():
         #If no answer
         if (infos == {'add': []}):
             infos = 'No answer'
-            subprocess.check_output(["rm", "tmp.txt"])
+            subprocess.check_output(["rm", nameFile])
             return infos
-        subprocess.check_output(["rm", "tmp.txt"])
+        subprocess.check_output(["rm", nameFile])
         return infos
 
     def extractIP(self, info):
@@ -230,13 +231,6 @@ class Dnsenum():
         "Method to bruteforce possible subdomains, based on a dictionary"
         dictBFSubDom={}
 
-        #t1=ThreadBF('Test1')
-        #t2=ThreadBF('Test2')
-        #t1.start()
-        #t2.start()
-        #t1.join()
-        #t2.join()
-
         with open(dictio, 'rb') as f:
             for line in f:
                 try:
@@ -246,7 +240,6 @@ class Dnsenum():
                 if (line[0] == '#'):
                     continue
                 tryBF=line.strip('\n')
-                #print(tryBF)
                 testSp=tryBF.find(' ')
                 if (testSp != -1):
                     continue
@@ -254,7 +247,6 @@ class Dnsenum():
                     outputtryBF=subprocess.check_output('dig ' + tryBF + '.' + self.domain.url, stderr=subprocess.STDOUT, shell=True)
                 except:
                     continue
-                #print(outputtryBF)
                 resultTryBF=self.readOutput(outputtryBF)
                 if (resultTryBF != 'No answer'):
                     if isinstance(resultTryBF['ans'], str):
@@ -268,15 +260,52 @@ class Dnsenum():
                         dictBFSubDom[tryBF + '.' + self.domain.url]=listBFSubDom
             f.close()
             self.chunkSubDom.append(dictBFSubDom)
-            #self.domain.setSubDomain(dictBFSubDom)
 
     def launchThreadBF(self):
+        fd=open(self.dictio, 'rb')
+        n=0
+        for line in fd:
+            n+=1
+        fd.close()
+        #print(n)
+        l=round(n/2)
+        r=n%2
+        #print(l)
+        fd1=open('dic/dic1', 'wb')
+        fd2=open('dic/dic2', 'wb')
+        fd3=open(self.dictio, 'rb')
+        i=1
+        for line in fd3:
+            if (i < l):
+                fd1.write(line)
+            else:
+                fd2.write(line)
+            i+=1
+        '''     
+        fd4=open('dic/dic1', 'rb')
+        n=0
+        for line in fd4:
+            n+=1
+        fd4.close()
+        print(n)
+        fd5=open('dic/dic2', 'rb')
+        n=0
+        for line in fd5:
+            n+=1
+        fd5.close()
+        print(n)
+        '''
+
         dictFinalBFSubDom={}
-        t1=threading.Thread(None, self.processBFSubDomain, None, (self.dictio,))
-        #t2=threading.Thread(None, self.processBFSubDomain)
+        t1=threading.Thread(None, self.processBFSubDomain, None, ('dic/dic1',))
+        t2=threading.Thread(None, self.processBFSubDomain, None, ('dic/dic2',))
         t1.start()
+        t2.start()
         t1.join()
+        t2.join()
         for item in self.chunkSubDom:
             for key,value in item.items():
                 dictFinalBFSubDom[key]=value
         self.domain.setSubDomain(dictFinalBFSubDom)
+        subprocess.check_output(["rm", "dic/dic1"])
+        subprocess.check_output(["rm", "dic/dic2"])
