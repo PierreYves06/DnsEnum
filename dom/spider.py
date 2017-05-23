@@ -48,47 +48,27 @@ class Spider():
         """Filter operation of the HTTP's codes which interests us"""
         #print('Dict debut boucle')
         #print(dictResult)
+        long=len(dictResult)
         for cle,valeur in dictResult.items():
             if (valeur in [200, 403]):
                 #Removing possible Url's parameters
-                indexF=cle.find('?')
-                if (indexF != -1):
-                    print("\n")
-                    print('TRIGGER')
-                    print(cle)
-                    print(cle[:indexF])
-                    dictResult[cle[:indexF]]=valeur
-                    print('Dict avant del')
-                    print(dictResult)
-                    del dictResult[cle]
-                    print('Dict apres del')
-                    print(dictResult)
-                    cle=cle[:indexF]
-                indexF=cle.find('#')
-                if (indexF != -1):
-                    print("\n")
-                    print('TRIGGER')
-                    print(cle)
-                    print(cle[:indexF])
-                    dictResult[cle[:indexF]]=valeur
-                    print('Dict avant del')
-                    print(dictResult)
-                    del dictResult[cle]
-                    print('Dict apres del')
-                    print(dictResult)
-                    cle=cle[:indexF]
-                indexF=cle.find('@')
-                if (indexF != -1):
-                    print("\n")
-                    print('TRIGGER')
-                    print(cle)
-                    print(cle[:indexF])
-                    dictResult[cle[:indexF]]=valeur
-                    print('Dict avant del')
-                    print(dictResult)
-                    del dictResult[cle]
-                    print('Dict apres del')
-                    print(dictResult)
+                symURL=['@','?','#']
+                for sym in symURL:
+                    indexF=cle.find(sym)
+                    if (indexF != -1):
+                        print("\n")
+                        print('TRIGGER')
+                        print(cle)
+                        print(cle[:indexF])
+                        dictResult[cle[:indexF]]=valeur
+                        print('Dict avant del')
+                        print(dictResult)
+                        if (len(dictResult) != long):
+                            del dictResult[cle]
+                            print('Dict apres del')
+                            print(dictResult)
+                        cle=cle[:indexF]
+
                 listeFiltered.append(dictResult)
 
     def processHttpError(self, opener, request, result, url):
