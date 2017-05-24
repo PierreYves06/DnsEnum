@@ -106,8 +106,17 @@ class Spider():
         
         #Then, we instantiate our opener handling redirections and we provide it the request 
         openerRed = build_opener(openanything.SmartRedirectHandler())
-        f = openerRed.open(requestInit)
-        result[url]=f.status
+
+        #Here 503 HTTP error not handled sometimes
+        try:
+            f = openerRed.open(requestInit)
+            result[url]=f.status
+        except HTTPError as e:
+            print('Fuck !')
+            print(e.code)
+            result[url]=e.code
+            
+            
 
         #If redirection, we start over the process error+redirection on the new URL until we obtain HTTP's code 200
         if ((str(f.status))[0] == '3'):
@@ -119,9 +128,16 @@ class Spider():
                     return result
 
                 #Here 503 HTTP error not handled sometimes
-                fRedir = openerRed.open(requestRedir)
-                codeRedir=fRedir.status
-                result[f.newurl]=fRedir.status
+                try:
+                    fRedir = openerRed.open(requestRedir)
+                    codeRedir=fRedir.status
+                    result[f.newurl]=fRedir.status
+                except HTTPError as e:
+                    print('Fuck !')
+                    print(e.code)
+                    codeRedir=e.code
+                    result[f.newurl]=e.code
+                    return result
         return result
 
     def processBFSpider(self, dom, dictio, listeFin):
@@ -190,11 +206,6 @@ class Spider():
 
         #If necessary, we rewrite the target provided for urllib's format
         if (listeFin == []):
-            #dom=self.domain.url
-            #if (dom[:6] != 'http://'):
-            #    dom='http://' + self.domain.url
-            #if (dom[-1] != '/'):
-            #    dom=dom + '/'
             
             #We check a possible domain's redirection on target (often redirect to www's subdomain)
             result=self.requestBF(dom)
@@ -208,60 +219,6 @@ class Spider():
                     break
 
         listTree=self.processBFSpider(dom, self.dictio, listeFin)
-        '''    
-        #Start bruteforce
-        with open(self.dictio, 'rb') as f:
-            for line in f:
-                try:
-                    line=line.decode('utf-8')
-                except UnicodeDecodeError:
-                    continue
-                #Dictionnary's commentary
-                if (line[0] == '#'):
-                    continue
-                line=line.strip('\n')
-                #If final list is not empty, This is not the first iteration on the domain
-                if (listeFin != []):
-                    for dictio in listeFin[-1]:
-                        for url,code in dictio.items():
-                            filename, file_ext=os.path.splitext(url)
-                            if (code in [200, 403]) and (file_ext not in extFile):
-                                #Detection of codes which interest us and files which may produce HTTP's code 200 infinitely
-                                if (code == 200):
-                                    #We check that previous url's segment is not a 403
-                                    #If so, we don't launch requests, which may produce HTTP's code 200 infinitely
-                                    tabUrl=(url.strip('/')).split('/')
-                                    del tabUrl[-1]
-                                    if (len(tabUrl) > 2):
-                                        testUrl=tabUrl[0] + '//' + tabUrl[1] + ('/'.join(tabUrl[2:])) + '/'
-                                        result=self.requestBF(testUrl)
-                                        
-                                        #A HTTP's error 403 produces always a dictionnary with 1 item
-                                        if (len(result) == 1):
-                                            if (result[testUrl] == 403):
-                                                continue
-                                if (url[-1] != '/'):
-                                    url=url+'/'
-                                result=self.requestBF(url+line)
-                                #print('***********************')
-                                print('Try: ' + url+line)
-                                print(result)
-                                #print('***********************')                                
-                                self.codeFilter(result, listTree)
-                            else:
-                                continue
-                else:
-                    if (dom[-1] != '/'):
-                        dom=dom+'/'
-                    result=self.requestBF(dom+line)
-                    #print('***********************')
-                    print('Try: ' + dom+line)
-                    print(result)
-                    #print('***********************')
-                    self.codeFilter(result, listTree)
-
-        listTree=self.processDoublons(listTree)
-        '''
         #We compare previous list with the actual to eliminate possible duplicate items
         if (listeFin != []):
             newListTree=[]
