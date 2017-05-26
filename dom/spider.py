@@ -93,7 +93,7 @@ class Spider():
         requestInit=Request(url)
 
         #We delay between each requests to avoid sensitive IDS or antiDDOS
-        time.sleep(1)
+        time.sleep(2)
 
         #Possibility to make request more verboses if there's a problem
         HTTPConnection.debuglevel = 0
@@ -115,6 +115,7 @@ class Spider():
             print('Fuck !')
             print(e.code)
             result[url]=e.code
+            return result
             
             
 
@@ -219,6 +220,7 @@ class Spider():
                     break
 
         listTree=self.processBFSpider(dom, self.dictio, listeFin)
+
         #We compare previous list with the actual to eliminate possible duplicate items
         if (listeFin != []):
             newListTree=[]
