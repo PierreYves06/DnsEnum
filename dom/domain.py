@@ -3,6 +3,7 @@
 
 from dom.dnsenum import *
 from dom.spider import *
+from dom.gatherInfos import *
 
 class Domain:
     "Class which models a domain and possible operations on it"
@@ -56,3 +57,9 @@ class Domain:
 
     def getArbo(self):
         return self.arbo
+
+    def setInfos(self, infos):
+        self.infos=infos
+
+    def getInfos(self):
+        return self.infos

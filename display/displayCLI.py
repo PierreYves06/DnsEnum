@@ -263,6 +263,11 @@ class displayCLI(Thread):
         self.enumSolo('DNS\'s enumeration')
         self.spiderSolo('Spider')
 
+    def gatherInfos(self):
+        gatherer = GatherInfos(self.target)
+        gatherer.getNetcraftInfos()
+        print(self.target.getInfos()) 
+
     def quitCLI(self):
         """Method which stops the thread and quit the CLI"""
         print(Fore.CYAN + 'Bye !' + Style.RESET_ALL)
@@ -273,7 +278,8 @@ class displayCLI(Thread):
         options={'1': self.enumSolo,
                     '2': self.spiderSolo,
                     '3': self.enumSpider,
-                    '4': self.quitCLI,
+                    '4': self.gatherInfos,
+                    '5': self.quitCLI,
         }
         self.running = True
 
@@ -301,7 +307,8 @@ class displayCLI(Thread):
                     +'DNS\'s enumeration' + Style.RESET_ALL + '\n\t2'\
                     + ' - '+ Fore.GREEN +'Spider' + Style.RESET_ALL\
                     + '\n\t3 - '+ Fore.GREEN +'DNS\'s enumeration + Spider'\
-                    + Style.RESET_ALL + '\n\t4 - '+ Fore.GREEN +'Exit' + Style.RESET_ALL + '\n')
+                    + Style.RESET_ALL + '\n\t4 - '+ Fore.GREEN +'Gather informations' \
+                    + Style.RESET_ALL + '\n\t5 - '+ Fore.GREEN +'Exit' +Style.RESET_ALL + '\n')
             choice=input('Your choice ? : ')
             try:
                 if (choice == '1'):

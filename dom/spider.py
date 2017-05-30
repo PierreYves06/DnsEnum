@@ -111,12 +111,11 @@ class Spider():
         try:
             f = openerRed.open(requestInit)
             result[url]=f.status
-        except HTTPError as e:
+        except (HTTPError, URLError) as e:
             print('Fuck !')
             print(e.code)
             result[url]=e.code
             return result
-            
             
 
         #If redirection, we start over the process error+redirection on the new URL until we obtain HTTP's code 200
@@ -133,7 +132,7 @@ class Spider():
                     fRedir = openerRed.open(requestRedir)
                     codeRedir=fRedir.status
                     result[f.newurl]=fRedir.status
-                except HTTPError as e:
+                except (HTTPError, URLError) as e:
                     print('Fuck !')
                     print(e.code)
                     codeRedir=e.code
@@ -178,9 +177,10 @@ class Spider():
                                                 continue
                                 if (url[-1] != '/'):
                                     url=url+'/'
+                                print('Try: ' + url+line)
                                 result=self.requestBF(url+line)
                                 #print('***********************')
-                                print('Try: ' + url+line)
+                                #print('Try: ' + url+line)
                                 print(result)
                                 #print('***********************')
                                 self.codeFilter(result, listTree)
@@ -189,9 +189,10 @@ class Spider():
                 else:
                     if (dom[-1] != '/'):
                         dom=dom+'/'
+                    print('Try: ' + dom+line)
                     result=self.requestBF(dom+line)
                     #print('***********************')
-                    print('Try: ' + dom+line)
+                    #print('Try: ' + dom+line)
                     print(result)
                     #print('***********************')
                     self.codeFilter(result, listTree)
