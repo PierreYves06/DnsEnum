@@ -15,4 +15,16 @@ class GatherInfos():
     def getNetcraftInfos(self):
         r = requests.get('http://toolbar.netcraft.com/site_report?url=' + self.domain.getUrl())
         soup = BeautifulSoup(r.text, 'html.parser')
-        self.domain.setInfos(soup.prettify())
+        reportSections=soup.find_all('section', attrs={'class':'site_report_table'})
+        #lineReports=reportSections.find('tr', attrs={'class':'TBtr2'})
+        #reportsLines = reportSections.find_all('tr', attrs={'class':'TBtr2'})
+        #print(reportsLines)
+        for report in reportSections:
+            print(report.findAll('tr', attrs={'class':'TBtr'}))
+            print(report.findAll('tr', attrs={'class':'TBtr2'}))
+            input('Press a key')
+        #print(reportSections)
+        #for section in reportSections:
+        #    print(section.get('class')) 
+
+        self.domain.setInfos(reportSections)

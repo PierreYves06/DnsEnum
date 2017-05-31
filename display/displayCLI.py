@@ -186,6 +186,9 @@ class displayCLI(Thread):
         output+=self.lectureDigResponse(self.target.getTXT())
         return output
 
+    #def displayGatheringInfos(self, liste):
+        
+
     @decoratorTimerProcess
     def enumSolo(self, name='DNS\'s enumeration'):
         """Method which launches DNS's enumeration"""
@@ -266,7 +269,7 @@ class displayCLI(Thread):
     def gatherInfos(self):
         gatherer = GatherInfos(self.target)
         gatherer.getNetcraftInfos()
-        print(self.target.getInfos()) 
+        #print(self.target.getInfos()) 
         #print(type(self.target.getInfos()))
 
     def quitCLI(self):
@@ -302,6 +305,10 @@ class displayCLI(Thread):
                 continue
             if (self.args['-s']):
                 self.spiderSolo('Spider')
+                self.quitCLI()
+                continue
+            if (self.args['-g']):
+                self.gatherInfos()
                 self.quitCLI()
                 continue
             print('What do you want to do ?\n\n\t1 - '+ Fore.GREEN \
