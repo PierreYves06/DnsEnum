@@ -266,7 +266,7 @@ class displayCLI(Thread):
     def gatherInfos(self):
         gatherer = GatherInfos(self.target)
         gatherer.getNetcraftInfos()
-        #print(self.target.getInfos()) 
+        print(self.target.getInfos()) 
         #print(type(self.target.getInfos()))
 
     def quitCLI(self):

@@ -2,8 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import requests
-from lib.customHtmlParser import CustomHtmlParser
-
+from bs4 import BeautifulSoup
 
 class GatherInfos():
     """Class dedicated to gathering informations"""
@@ -14,8 +13,6 @@ class GatherInfos():
         self.domain=domain
 
     def getNetcraftInfos(self):
-        r = requests.get('https://searchdns.netcraft.com/?host=' + self.domain.getUrl())
-        
-        self.domain.setInfos(r.text)
-        parser = CustomHtmlParser()
-        parser.feed(r.text)
+        r = requests.get('http://toolbar.netcraft.com/site_report?url=' + self.domain.getUrl())
+        soup = BeautifulSoup(r.text, 'html.parser')
+        self.domain.setInfos(soup.prettify())
