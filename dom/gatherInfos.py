@@ -12,6 +12,12 @@ class GatherInfos():
         "Initialized with a Domain's object"
         self.domain=domain
 
+    def tagToString(self, list):
+        stringList=[]
+        for item in list:
+            stringList.append(item.get_text())
+        return stringList
+
     def getNetcraftInfos(self):
         listInfos=[]
         r = requests.get('http://toolbar.netcraft.com/site_report?url=' + self.domain.getUrl())
@@ -21,11 +27,7 @@ class GatherInfos():
         for report in reportSections:
             dictInfos = {}
             lines1=report.find_all('tr', attrs={'class':'TBtr'})
-            #print(lines1)
-            #input('Press a key')
             lines2=report.find_all('tr', attrs={'class':'TBtr2'})
-            #print(lines2)
-            #input('Press a key')
             lines=lines1+lines2
             for line in lines:
                 titlesTag=line.find_all('th')
@@ -33,15 +35,28 @@ class GatherInfos():
                 i=0
                 for title in titlesTag:
                     dictInfos[title.get_text()]=(contentsTag[i]).get_text()
-                    #print(title.get_text())
-                    #print((contentsTag[i]).get_text())
                     i+=1
                     #input('Press a key')
-                #long=len(titles)
-                #i=0
-                #while (i < long):
-                    
-                #input('Press a key')
             listInfos.append(dictInfos)
+
+        for report in reportSections:
+            dictInfos = {}
+            listLines=[]
+            lines=report.find_all('tr', attrs={'class':'TBtrtitle'})
+            for line in lines:
+                titlesTag=line.find_all('th')
+                allContentsTag=line.find_next('tbody')
+                titlesTag=self.tagToString(titlesTag)
+                #print(titlesTag)
+                #print(contentsTag)
+                lines1=allContentsTag.find_all('tr', attrs={'class':'TBtr'})
+                lines2=allContentsTag.find_all('tr', attrs={'class':'TBtr2'})
+                lines=lines1+lines2
+                for line in lines:
+                    contentsTag=line.find_all('td')
+                    print(titlesTag)
+                    print(contentsTag)
+                    input('Press a key')
+                    listLines.append(contentsTag)
 
         self.domain.setInfos(listInfos)
