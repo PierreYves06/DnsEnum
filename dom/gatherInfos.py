@@ -43,7 +43,8 @@ class GatherInfos():
         for report in reportSections:
             dictInfos = {}
             listLines=[]
-            lines=report.find_all('tr', attrs={'class':'TBtrtitle'})
+            #lines=report.find_all('tr', attrs={'class':'TBtrtitle'})
+            lines=report.find_all('thead')
             for line in lines:
                 titlesTag=line.find_all('th')
                 allContentsTag=line.find_next('tbody')

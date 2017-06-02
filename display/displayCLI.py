@@ -187,7 +187,14 @@ class displayCLI(Thread):
         return output
 
     def displayGatheringInfos(self, liste):
-        print(liste)
+        #print(liste)
+        output=''
+        for dict in liste:
+            for item in dict:
+                print(item)
+                print(dict[item])
+        return output
+        
 
     @decoratorTimerProcess
     def enumSolo(self, name='DNS\'s enumeration'):
@@ -270,8 +277,8 @@ class displayCLI(Thread):
         gatherer = GatherInfos(self.target)
         gatherer.getNetcraftInfos()
         output=self.displayGatheringInfos(self.target.getInfos())
-        #print(self.target.getInfos()) 
-        #print(type(self.target.getInfos()))
+        self.verboseOnOff(output, '_informations.txt')
+        print('Result of the gathering informations in the file results/' + self.target.getUrl() + '/' + self.target.getUrl() + '_informations.txt')
 
     def quitCLI(self):
         """Method which stops the thread and quit the CLI"""
