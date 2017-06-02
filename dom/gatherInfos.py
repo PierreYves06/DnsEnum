@@ -37,7 +37,8 @@ class GatherInfos():
                     dictInfos[title.get_text()]=(contentsTag[i]).get_text()
                     i+=1
                     #input('Press a key')
-            listInfos.append(dictInfos)
+            if dictInfos != {}:
+                listInfos.append(dictInfos)
 
         for report in reportSections:
             dictInfos = {}
@@ -62,6 +63,7 @@ class GatherInfos():
                     listLines.append(contentsTag)
                 #print(listLines)
                 dictInfos[titlesTagKey]=listLines
-            listInfos.append(dictInfos)    
+            if dictInfos != {}:
+                listInfos.append(dictInfos)    
 
         self.domain.setInfos(listInfos)
