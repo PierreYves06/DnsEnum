@@ -47,6 +47,7 @@ class GatherInfos():
                 titlesTag=line.find_all('th')
                 allContentsTag=line.find_next('tbody')
                 titlesTag=self.tagToString(titlesTag)
+                titlesTagKey=';'.join(titlesTag)
                 #print(titlesTag)
                 #print(contentsTag)
                 lines1=allContentsTag.find_all('tr', attrs={'class':'TBtr'})
@@ -54,9 +55,13 @@ class GatherInfos():
                 lines=lines1+lines2
                 for line in lines:
                     contentsTag=line.find_all('td')
-                    print(titlesTag)
-                    print(contentsTag)
-                    input('Press a key')
+                    contentsTag=self.tagToString(contentsTag)
+                    #print(titlesTag)
+                    #print(contentsTag)
+                    #input('Press a key')
                     listLines.append(contentsTag)
+                #print(listLines)
+                dictInfos[titlesTagKey]=listLines
+            listInfos.append(dictInfos)    
 
         self.domain.setInfos(listInfos)
