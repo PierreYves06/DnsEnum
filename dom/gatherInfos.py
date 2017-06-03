@@ -1,7 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-import requests
+import requests, subprocess, shlex
 from bs4 import BeautifulSoup
 
 class GatherInfos():
@@ -17,6 +17,13 @@ class GatherInfos():
         for item in list:
             stringList.append(item.get_text())
         return stringList
+
+    def execCmd(self, cmd):
+        "Execute a command and return error if necessary"
+        args=shlex.split(cmd)
+        p=subprocess.Popen(args, stderr=subprocess.PIPE)
+        err=p.stderr.read().decode('utf-8')
+        return err
 
     def getNetcraftInfos(self):
         listInfos=[]
@@ -68,3 +75,10 @@ class GatherInfos():
                 listInfos.append(dictInfos)    
 
         self.domain.setInfos(listInfos)
+
+    def whoisProcess(self):
+        output=subprocess.check_output('whois ' + self.domain.getUrl(), shell=True)
+        return output
+        #if output != '':
+            #print('Error : ' + output)
+        

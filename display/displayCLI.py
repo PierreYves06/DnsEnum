@@ -284,8 +284,11 @@ class displayCLI(Thread):
         gatherer = GatherInfos(self.target)
         gatherer.getNetcraftInfos()
         output=self.displayGatheringInfos(self.target.getInfos())
-        self.verboseOnOff(output, '_informations.txt')
-        print('Result of the gathering informations in the file results/' + self.target.getUrl() + '/' + self.target.getUrl() + '_informations.txt')
+        self.writeResult(self.target.getUrl() + '_informations.txt', output)
+        print('Result of the netcraft\'s gathering informations in the file results/' + self.target.getUrl() + '/' + self.target.getUrl() + '_informations.txt')
+        output=(gatherer.whoisProcess()).decode('utf-8')
+        self.writeResult(self.target.getUrl() + '_whois.txt', output)
+        print('Result of the whois in the file results/' + self.target.getUrl() + '/' + self.target.getUrl() + '_whois.txt')
 
     def quitCLI(self):
         """Method which stops the thread and quit the CLI"""
