@@ -187,20 +187,19 @@ class displayCLI(Thread):
         return output
 
     def displayGatheringInfos(self, liste):
-        #print(liste)
         output=''
         for dict in liste:
-            print(dict)
             for key,value in dict.items():
                 if (isinstance(value, str)):
-                    print(key.strip('\n\xa0'))
-                    print(value.strip('\n\xa0'))
+                    output+=key.strip('\n\xa0') + ' : ' + value.strip('\n\xa0') + '\n'
                 elif (isinstance(value, list)):
-                    print(key)
-                    #print(value)
+                    output+=key + '\n'
                     for item in value:
-                        item[-1]=(item[-1].replace('\n', '')).replace(' ', '')
-                        print('\t'.join(item))
+                        newItem=[]
+                        for entry in item:
+                            newItem.append(entry.replace('\n', ''))
+                        newItem[-1]=newItem[-1].replace(' ', '')
+                        output+='\t'.join(newItem) + '\n'
         return output
         
 
