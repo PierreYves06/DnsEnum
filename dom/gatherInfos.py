@@ -49,7 +49,7 @@ class GatherInfos():
                 titlesTag=line.find_all('th')
                 allContentsTag=line.find_next('tbody')
                 titlesTag=self.tagToString(titlesTag)
-                titlesTagKey=';'.join(titlesTag)
+                titlesTagKey='\t'.join(titlesTag)
                 #print(titlesTag)
                 #print(contentsTag)
                 lines1=allContentsTag.find_all('tr', attrs={'class':'TBtr'})

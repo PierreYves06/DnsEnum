@@ -113,8 +113,8 @@ class Spider():
             result[url]=f.status
         except (HTTPError, URLError) as e:
             print('Fuck !')
-            print(e.code)
-            result[url]=e.code
+            #print(e.code)
+            result[url]=503
             return result
             
 
@@ -134,9 +134,9 @@ class Spider():
                     result[f.newurl]=fRedir.status
                 except (HTTPError, URLError) as e:
                     print('Fuck !')
-                    print(e.code)
-                    codeRedir=e.code
-                    result[f.newurl]=e.code
+                    #print(e.code)
+                    #codeRedir=e.code
+                    result[f.newurl]=503
                     return result
         return result
 

@@ -190,9 +190,17 @@ class displayCLI(Thread):
         #print(liste)
         output=''
         for dict in liste:
-            for item in dict:
-                print(item)
-                print(dict[item])
+            print(dict)
+            for key,value in dict.items():
+                if (isinstance(value, str)):
+                    print(key.strip('\n\xa0'))
+                    print(value.strip('\n\xa0'))
+                elif (isinstance(value, list)):
+                    print(key)
+                    #print(value)
+                    for item in value:
+                        item[-1]=(item[-1].replace('\n', '')).replace(' ', '')
+                        print('\t'.join(item))
         return output
         
 
