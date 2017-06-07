@@ -52,6 +52,7 @@ class GatherInfos():
             listLines=[]
             #lines=report.find_all('tr', attrs={'class':'TBtrtitle'})
             lines=report.find_all('thead')
+            techno=[]
             for line in lines:
                 titlesTag=line.find_all('th')
                 allContentsTag=line.find_next('tbody')
@@ -62,18 +63,25 @@ class GatherInfos():
                 lines1=allContentsTag.find_all('tr', attrs={'class':'TBtr'})
                 lines2=allContentsTag.find_all('tr', attrs={'class':'TBtr2'})
                 lines=lines1+lines2
+                #techno=[]
                 for line in lines:
                     contentsTag=line.find_all('td')
                     contentsTag=self.tagToString(contentsTag)
-                    #print(titlesTag)
-                    #print(contentsTag)
-                    #input('Press a key')
-                    listLines.append(contentsTag)
+                    print(titlesTag)
+                    print(contentsTag)
+                    input('Press a key')
+                    if (titlesTag[0] == 'Technology'):
+                        techno.append(contentsTag[0])
+                    else:
+                        listLines.append(contentsTag)
                 #print(listLines)
+                if techno != []:
+                    listLines=techno
+                    
                 dictInfos[titlesTagKey]=listLines
             if dictInfos != {}:
                 listInfos.append(dictInfos)    
-
+        print(listInfos)
         self.domain.setInfos(listInfos)
 
     def whoisProcess(self):
