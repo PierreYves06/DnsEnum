@@ -310,7 +310,9 @@ class displayCLI(Thread):
 
         self.custom_print('\n\t\t\tPenTesting Scout v1.0\n', Fore.CYAN)
         while self.running:
-            print('Your target : ' + Fore.MAGENTA + self.target.getUrl() + Style.RESET_ALL + '\n')
+            print('Your target : ' + Fore.MAGENTA + self.target.getUrl() + Style.RESET_ALL)
+            if hasattr(self.target, 'IP'):
+                print('IP address : ' + Fore.MAGENTA + self.target.getIP() + Style.RESET_ALL)
 
             #According to provided arguments, we run the desired functionality
             if (self.args['-e']) and (self.args['-s']):
