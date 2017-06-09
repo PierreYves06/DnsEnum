@@ -1,7 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-import time, os
+import time, os, http
 from urllib.request import Request, build_opener, URLError, urlopen, HTTPError
 from http.client import HTTPConnection
 from lib import openanything
@@ -76,9 +76,10 @@ class Spider():
         testDataStream=''
         try:
             testDataStream = opener.open(request)
-        except URLError as e:
+        except (HTTPError, URLError, http.client.HTTPException) as e:
             #If error, there's an issue with URL, we leave the method
-            result[url]=str(e.reason)
+            print('Fuck !')
+            result[url]=503
             return result
         code=testDataStream.status
         #If we find 400 or 500 code, we have an HTTP's error
@@ -111,7 +112,7 @@ class Spider():
         try:
             f = openerRed.open(requestInit)
             result[url]=f.status
-        except (HTTPError, URLError) as e:
+        except (HTTPError, URLError, http.client.HTTPException) as e:
             print('Fuck !')
             #print(e.code)
             result[url]=503
@@ -132,7 +133,7 @@ class Spider():
                     fRedir = openerRed.open(requestRedir)
                     codeRedir=fRedir.status
                     result[f.newurl]=fRedir.status
-                except (HTTPError, URLError) as e:
+                except (HTTPError, URLError, http.client.HTTPException) as e:
                     print('Fuck !')
                     #print(e.code)
                     #codeRedir=e.code

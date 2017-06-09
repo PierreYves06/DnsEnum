@@ -52,7 +52,7 @@ class GatherInfos():
             listLines=[]
             #lines=report.find_all('tr', attrs={'class':'TBtrtitle'})
             lines=report.find_all('thead')
-            techno=[]
+            techno=''
             for line in lines:
                 titlesTag=line.find_all('th')
                 allContentsTag=line.find_next('tbody')
@@ -67,18 +67,24 @@ class GatherInfos():
                 for line in lines:
                     contentsTag=line.find_all('td')
                     contentsTag=self.tagToString(contentsTag)
-                    print(titlesTag)
-                    print(contentsTag)
-                    input('Press a key')
+                    #print(titlesTag)
+                    #print(contentsTag)
+                    #input('Press a key')
                     if (titlesTag[0] == 'Technology'):
-                        techno.append(contentsTag[0])
+                        techno=contentsTag[0]
+                        #print(techno)
+                        #input('Press a key')
                     else:
                         listLines.append(contentsTag)
                 #print(listLines)
-                if techno != []:
-                    listLines=techno
-                    
-                dictInfos[titlesTagKey]=listLines
+                if techno != '':
+                    print(techno)
+                    listLines.append(techno)
+                    dictInfos[titlesTag[0]]=','.join(listLines)
+                    techno = ''
+                else:       
+                    dictInfos[titlesTagKey]=listLines
+            #print(dictInfos)
             if dictInfos != {}:
                 listInfos.append(dictInfos)    
         print(listInfos)
