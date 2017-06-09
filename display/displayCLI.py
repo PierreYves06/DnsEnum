@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 from math import *
-import sys, time, os
+import sys, time, os, json
 from colorama import init, Fore, Back, Style
 from threading import Thread
 from dom.domain import *
@@ -209,9 +209,10 @@ class displayCLI(Thread):
         dnsenum=Dnsenum(self.target, self.dictio)
         print(Style.BRIGHT + 'DNS\'s enumeration in progress...' + Style.RESET_ALL)
         dnsenum.processDig()
-        output=self.displayDnsEnum()
-        self.verboseOnOff(output, '_dnsenum.txt')
-        print('Result of the DNS\'s enumeration in the file results/' + self.target.getUrl() + '/' + self.target.getUrl() + '_dnsenum.txt')
+        #output=self.displayDnsEnum()
+        output=[self.target.getIP(), self.target.getNS(), self.target.getMX(), self.target.getTXT()]
+        self.verboseOnOff(json.dumps(output), '_dnsenum.json')
+        print('Result of the DNS\'s enumeration in the file results/' + self.target.getUrl() + '/' + self.target.getUrl() + '_dnsenum.json')
 
         if (self.args['-f']):
             resp=True
@@ -283,12 +284,12 @@ class displayCLI(Thread):
     def gatherInfos(self):
         gatherer = GatherInfos(self.target)
         gatherer.getNetcraftInfos()
-        output=self.displayGatheringInfos(self.target.getInfos())
-        self.writeResult(self.target.getUrl() + '_informations.txt', output)
-        print('Result of the netcraft\'s gathering informations in the file results/' + self.target.getUrl() + '/' + self.target.getUrl() + '_informations.txt')
+        #output=self.displayGatheringInfos(self.target.getInfos())
+        self.writeResult(self.target.getUrl() + '_informations.json', json.dumps(self.target.getInfos()))
+        print('Result of the netcraft\'s gathering informations in the file results/' + self.target.getUrl() + '/' + self.target.getUrl() + '_informations.json')
         output=(gatherer.whoisProcess()).decode('utf-8')
-        self.writeResult(self.target.getUrl() + '_whois.txt', output)
-        print('Result of the whois in the file results/' + self.target.getUrl() + '/' + self.target.getUrl() + '_whois.txt')
+        self.writeResult(self.target.getUrl() + '_whois.json', json.dumps(output))
+        print('Result of the whois in the file results/' + self.target.getUrl() + '/' + self.target.getUrl() + '_whois.json')
 
     def quitCLI(self):
         """Method which stops the thread and quit the CLI"""
@@ -310,9 +311,11 @@ class displayCLI(Thread):
 
         self.custom_print('\n\t\t\tPenTesting Scout v1.0\n', Fore.CYAN)
         while self.running:
-            print('Your target : ' + Fore.MAGENTA + self.target.getUrl() + Style.RESET_ALL)
+            print('Your target : ', end='')
+            self.custom_print(self.target.getUrl(), Fore.MAGENTA)
             if hasattr(self.target, 'IP'):
-                print('IP address : ' + Fore.MAGENTA + self.target.getIP() + Style.RESET_ALL)
+                print('IP address : ', end='') 
+                self.custom_print(self.target.getIP(), Fore.MAGENTA)
 
             #According to provided arguments, we run the desired functionality
             if (self.args['-e']) and (self.args['-s']):
@@ -331,13 +334,18 @@ class displayCLI(Thread):
                 self.gatherInfos()
                 self.quitCLI()
                 continue
-            print('What do you want to do ?\n\n\t1 - '+ Fore.GREEN \
-                    +'DNS\'s enumeration' + Style.RESET_ALL + '\n\t2'\
-                    + ' - '+ Fore.GREEN +'Spider' + Style.RESET_ALL\
-                    + '\n\t3 - '+ Fore.GREEN +'DNS\'s enumeration + Spider'\
-                    + Style.RESET_ALL + '\n\t4 - '+ Fore.GREEN +'Gather informations' \
-                    + Style.RESET_ALL + '\n\t5 - '+ Fore.GREEN +'Exit' +Style.RESET_ALL + '\n')
-            choice=input('Your choice ? : ')
+
+            print('What do you want to do ?\n\n\t1 - ', end='')
+            self.custom_print('DNS\'s enumeration', Fore.GREEN)
+            print('\t2 - ', end='')
+            self.custom_print('Spider', Fore.GREEN)
+            print('\t3 - ', end='')
+            self.custom_print('DNS\'s enumeration + Spider', Fore.GREEN)
+            print('\t4 - ', end='')
+            self.custom_print('Gather informations', Fore.GREEN)
+            print('\t5 - ', end='')
+            self.custom_print('Exit', Fore.GREEN)
+            choice=input('\nYour choice ? : ')
             try:
                 if (choice == '1'):
                     options[choice]('DNS\'s Enumeration')

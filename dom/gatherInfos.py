@@ -25,6 +25,12 @@ class GatherInfos():
         err=p.stderr.read().decode('utf-8')
         return err
 
+    def getNetcraftSoup(self, soup_obj):
+        lines1=soup_obj.find_all('tr', attrs={'class':'TBtr'})
+        lines2=soup_obj.find_all('tr', attrs={'class':'TBtr2'})
+        lines=lines1+lines2
+        return lines
+
     def getNetcraftInfos(self):
         listInfos=[]
         r = requests.get('http://toolbar.netcraft.com/site_report?url=' + self.domain.getUrl())
@@ -33,9 +39,7 @@ class GatherInfos():
 
         for report in reportSections:
             dictInfos = {}
-            lines1=report.find_all('tr', attrs={'class':'TBtr'})
-            lines2=report.find_all('tr', attrs={'class':'TBtr2'})
-            lines=lines1+lines2
+            lines=self.getNetcraftSoup(report)
             for line in lines:
                 titlesTag=line.find_all('th')
                 contentsTag=line.find_all('td')
@@ -50,7 +54,6 @@ class GatherInfos():
         for report in reportSections:
             dictInfos = {}
             listLines=[]
-            #lines=report.find_all('tr', attrs={'class':'TBtrtitle'})
             lines=report.find_all('thead')
             techno=''
             for line in lines:
@@ -60,10 +63,7 @@ class GatherInfos():
                 titlesTagKey='\t'.join(titlesTag)
                 #print(titlesTag)
                 #print(contentsTag)
-                lines1=allContentsTag.find_all('tr', attrs={'class':'TBtr'})
-                lines2=allContentsTag.find_all('tr', attrs={'class':'TBtr2'})
-                lines=lines1+lines2
-                #techno=[]
+                lines=self.getNetcraftSoup(allContentsTag)
                 for line in lines:
                     contentsTag=line.find_all('td')
                     contentsTag=self.tagToString(contentsTag)
@@ -78,7 +78,7 @@ class GatherInfos():
                         listLines.append(contentsTag)
                 #print(listLines)
                 if techno != '':
-                    print(techno)
+                    #print(techno)
                     listLines.append(techno)
                     dictInfos[titlesTag[0]]=','.join(listLines)
                     techno = ''
@@ -87,7 +87,7 @@ class GatherInfos():
             #print(dictInfos)
             if dictInfos != {}:
                 listInfos.append(dictInfos)    
-        print(listInfos)
+        #print(listInfos)
         self.domain.setInfos(listInfos)
 
     def whoisProcess(self):
