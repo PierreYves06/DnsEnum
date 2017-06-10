@@ -86,12 +86,15 @@ class displayCLI(Thread):
     def custom_print(self, string):
         return string
 
-    def verboseOnOff(self, output, file):
+    def verboseOnOff(self, output, file, key):
         """Method which handles verbose mode"""
         #print(type(output))
         #print(type(json.loads(output)))
+        display_methods=[self.displayDnsEnum]
         if (self.verbose):
             print(json.loads(output))
+            display_methods[key]()
+            
         self.writeResult(self.target.getUrl() + file, output)
 
     def parseListeDictio(self, liste):
@@ -186,7 +189,7 @@ class displayCLI(Thread):
         output+=self.lectureDigResponse(self.target.getMX())
         output+='\nTXT\'s record of the target :\n'
         output+=self.lectureDigResponse(self.target.getTXT())
-        return output
+        print(output)
 
     def displayGatheringInfos(self, liste):
         output=''
@@ -213,7 +216,7 @@ class displayCLI(Thread):
         dnsenum.processDig()
         #output=self.displayDnsEnum()
         output={'IP' : self.target.getIP(), 'NS' : self.target.getNS(), 'MX' : self.target.getMX(), 'TXT' : self.target.getTXT()}
-        self.verboseOnOff(json.dumps(output), '_dnsenum.json')
+        self.verboseOnOff(json.dumps(output), '_dnsenum.json', 0)
         print('Result of the DNS\'s enumeration in the file results/' + self.target.getUrl() + '/' + self.target.getUrl() + '_dnsenum.json')
 
         if (self.args['-f']):
@@ -295,7 +298,7 @@ class displayCLI(Thread):
 
     def quitCLI(self):
         """Method which stops the thread and quit the CLI"""
-        print(Fore.CYAN + 'Bye !' + Style.RESET_ALL)
+        self.custom_print('Bye !', Fore.CYAN)
         self.running = False
 
     def run(self):
@@ -356,4 +359,4 @@ class displayCLI(Thread):
                 else:
                     options[choice]()
             except KeyError as e:
-                print(Fore.RED + choice + ' : Unknown choice' + Style.RESET_ALL)
+                self.custom_print(choice + ' : Unknown choice', Fore.RED)
