@@ -1,4 +1,4 @@
-# PenTesting Scout v1.0
+# PenTesting Scout v1.1
                                
 Use it during recognition phase in web site's pentesting. This tool provides
 dns enumeration with class C's reverse DNS and subdomain's bruteforce.
@@ -41,3 +41,6 @@ You have to install docopt and colorama with pip3
     -e              Launch the dns enumeration directly (no interactive mode)
     -s              Launch the spider directly (no interactive mode)
     --depth=DEPTH   Depth of the spider process, number of url's level to crawl, 2 by default
+
+## Historical
+    1.1 : Add gathering informations and data storage in JSON

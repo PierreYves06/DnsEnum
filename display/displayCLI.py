@@ -88,8 +88,10 @@ class displayCLI(Thread):
 
     def verboseOnOff(self, output, file):
         """Method which handles verbose mode"""
+        #print(type(output))
+        #print(type(json.loads(output)))
         if (self.verbose):
-            print(output)
+            print(json.loads(output))
         self.writeResult(self.target.getUrl() + file, output)
 
     def parseListeDictio(self, liste):
@@ -210,7 +212,7 @@ class displayCLI(Thread):
         print(Style.BRIGHT + 'DNS\'s enumeration in progress...' + Style.RESET_ALL)
         dnsenum.processDig()
         #output=self.displayDnsEnum()
-        output=[self.target.getIP(), self.target.getNS(), self.target.getMX(), self.target.getTXT()]
+        output={'IP' : self.target.getIP(), 'NS' : self.target.getNS(), 'MX' : self.target.getMX(), 'TXT' : self.target.getTXT()}
         self.verboseOnOff(json.dumps(output), '_dnsenum.json')
         print('Result of the DNS\'s enumeration in the file results/' + self.target.getUrl() + '/' + self.target.getUrl() + '_dnsenum.json')
 
