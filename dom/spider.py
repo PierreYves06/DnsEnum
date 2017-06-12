@@ -76,7 +76,7 @@ class Spider():
         testDataStream=''
         try:
             testDataStream = opener.open(request)
-        except (HTTPError, URLError, http.client.HTTPException) as e:
+        except (HTTPError, URLError, http.client.HTTPException, ConnectionResetError) as e:
             #If error, there's an issue with URL, we leave the method
             print('Fuck !')
             result[url]=503
@@ -112,7 +112,7 @@ class Spider():
         try:
             f = openerRed.open(requestInit)
             result[url]=f.status
-        except (HTTPError, URLError, http.client.HTTPException) as e:
+        except (HTTPError, URLError, http.client.HTTPException, ConnectionResetError) as e:
             print('Fuck !')
             #print(e.code)
             result[url]=503
@@ -133,7 +133,7 @@ class Spider():
                     fRedir = openerRed.open(requestRedir)
                     codeRedir=fRedir.status
                     result[f.newurl]=fRedir.status
-                except (HTTPError, URLError, http.client.HTTPException) as e:
+                except (HTTPError, URLError, http.client.HTTPException, ConnectionResetError) as e:
                     print('Fuck !')
                     #print(e.code)
                     #codeRedir=e.code

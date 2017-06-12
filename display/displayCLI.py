@@ -40,16 +40,20 @@ class displayCLI(Thread):
             self.verbose=True
         self.args=args
 
-    def writeResult(self, file, output):
+    def writeResult(self, file, outputT, outputJ):
         """Method for writing results in a file"""
         #Existence's verification of target's directory
-        if (os.path.exists('results/') == False):
-            os.mkdir('results/')
-        if (os.path.exists('results/' + self.target.getUrl()) == False):
-            os.mkdir('results/' + self.target.getUrl())
-        f=open('results/' + self.target.getUrl() + '/' + file, 'w')
-        f.write(output)
-        f.close()
+        if (os.path.exists('results/' + self.target.getUrl() + '/json/') == False):
+            os.makedirs('results/' + self.target.getUrl() + '/json/')
+        if (os.path.exists('results/' + self.target.getUrl() + '/txt/') == False):
+            os.makedirs('results/' + self.target.getUrl() + '/txt/')
+
+        ftxt=open('results/' + self.target.getUrl() + '/txt/' + file + '.txt', 'w')
+        fjson=open('results/' + self.target.getUrl() + '/json/' + file + '.json', 'w')
+        ftxt.write(outputT)
+        fjson.write(outputJ)
+        ftxt.close()
+        fjson.close()
 
     def decoratorTimerProcess(process):
         """Decorator which adds a timer to a process"""
@@ -91,11 +95,12 @@ class displayCLI(Thread):
         #print(type(output))
         #print(type(json.loads(output)))
         display_methods=[self.displayDnsEnum]
+        outputT=display_methods[key]()
+        outputJ=json.dumps(output)
         if (self.verbose):
-            print(json.loads(output))
-            display_methods[key]()
+            print(outputT)
             
-        self.writeResult(self.target.getUrl() + file, output)
+        self.writeResult(self.target.getUrl() + file, outputT, outputJ)
 
     def parseListeDictio(self, liste):
         """Method for reading dictionary's list"""
@@ -121,7 +126,7 @@ class displayCLI(Thread):
         else:
             return False
 
-    def lectureOtherResponse(self, dictio, type):
+    def displayOtherResponse(self, dictio, type):
         """Method for reading and display ReverseDNS and subdomain's bruteforce"""
         output=''
         for key,value in dictio.items():
@@ -141,7 +146,7 @@ class displayCLI(Thread):
             output+=(40*'-') + '\n'
         return output
 
-    def lectureDigResponse(self, liste):
+    def displayDigResponse(self, liste):
         """Method for reading dig's return"""
         output=''
         if liste == []:
@@ -182,14 +187,14 @@ class displayCLI(Thread):
         """Display's method of DNS's enumeration"""
         output=''
         output+='\nTarget\'s IP :\n'
-        output+=self.lectureDigResponse(self.target.getIP())
+        output+=self.displayDigResponse(self.target.getIP())
         output+='\nTarget\'s nameserver :\n'
-        output+=self.lectureDigResponse(self.target.getNS())
+        output+=self.displayDigResponse(self.target.getNS())
         output+='\nMail\'s server of the target :\n'
-        output+=self.lectureDigResponse(self.target.getMX())
+        output+=self.displayDigResponse(self.target.getMX())
         output+='\nTXT\'s record of the target :\n'
-        output+=self.lectureDigResponse(self.target.getTXT())
-        print(output)
+        output+=self.displayDigResponse(self.target.getTXT())
+        return output
 
     def displayGatheringInfos(self, liste):
         output=''
@@ -212,11 +217,11 @@ class displayCLI(Thread):
     def enumSolo(self, name='DNS\'s enumeration'):
         """Method which launches DNS's enumeration"""
         dnsenum=Dnsenum(self.target, self.dictio)
-        print(Style.BRIGHT + 'DNS\'s enumeration in progress...' + Style.RESET_ALL)
+        self.custom_print('DNS\'s enumeration in progress...', Style.BRIGHT)
         dnsenum.processDig()
-        #output=self.displayDnsEnum()
-        output={'IP' : self.target.getIP(), 'NS' : self.target.getNS(), 'MX' : self.target.getMX(), 'TXT' : self.target.getTXT()}
-        self.verboseOnOff(json.dumps(output), '_dnsenum.json', 0)
+        output={'IP' : self.target.getIP(), 'NS' : self.target.getNS(),\
+                 'MX' : self.target.getMX(), 'TXT' : self.target.getTXT()}
+        self.verboseOnOff(output, '_dnsenum', 0)
         print('Result of the DNS\'s enumeration in the file results/' + self.target.getUrl() + '/' + self.target.getUrl() + '_dnsenum.json')
 
         if (self.args['-f']):
@@ -228,8 +233,10 @@ class displayCLI(Thread):
             print(Style.BRIGHT + 'Reverse DNS of C class in progress...' + Style.RESET_ALL)
             dnsenum.processReverseDns()
             print('Result of the reverse DNS of C class in the file results/' + self.target.getUrl() + '/' + self.target.getUrl() + '_rev_dns.txt')
-            output=self.lectureOtherResponse(self.target.getReverseDNS(), 'RD')
-            self.writeResult(self.target.getUrl() + '_rev_dns.txt', output)
+            outputT=self.displayOtherResponse(self.target.getReverseDNS(), 'RD')
+            outputJ=json.dumps(self.target.getReverseDNS())
+            #print(outputJ)
+            self.writeResult(self.target.getUrl() + '_rev_dns', outputT, outputJ)
         else:
             print(Fore.RED + Style.BRIGHT + 'Reverse DNS ignored' + Style.RESET_ALL)
 
@@ -243,7 +250,7 @@ class displayCLI(Thread):
             print(Style.BRIGHT + 'Subdomain\'s bruteforce in progress...'+ Style.RESET_ALL)
             #dnsenum.processBFSubDomain()
             dnsenum.launchThreadBF()
-            output=self.lectureOtherResponse(self.target.getSubDomain(), 'BF')
+            output=self.displayOtherResponse(self.target.getSubDomain(), 'BF')
             self.verboseOnOff(output, '_bf_subdom.txt')
             print('Result of subdomain\'s bruteforce in the file results/' + self.target.getUrl() + '/' + self.target.getUrl() + '_bf_subdom.txt')
         else:
