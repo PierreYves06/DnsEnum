@@ -94,8 +94,11 @@ class displayCLI(Thread):
         """Method which handles verbose mode"""
         #print(type(output))
         #print(type(json.loads(output)))
-        display_methods=[self.displayDnsEnum]
-        outputT=display_methods[key]()
+        display_methods=[self.displayDnsEnum, self.displayOtherResponse]
+        if key != 0:
+            outputT=display_methods[key](output)
+        else:
+            outputT=display_methods[key]()
         outputJ=json.dumps(output)
         if (self.verbose):
             print(outputT)
@@ -126,7 +129,7 @@ class displayCLI(Thread):
         else:
             return False
 
-    def displayOtherResponse(self, dictio, type):
+    def displayOtherResponse(self, dictio, type='BF'):
         """Method for reading and display ReverseDNS and subdomain's bruteforce"""
         output=''
         for key,value in dictio.items():
@@ -222,17 +225,21 @@ class displayCLI(Thread):
         output={'IP' : self.target.getIP(), 'NS' : self.target.getNS(),\
                  'MX' : self.target.getMX(), 'TXT' : self.target.getTXT()}
         self.verboseOnOff(output, '_dnsenum', 0)
-        print('Result of the DNS\'s enumeration in the file results/' + self.target.getUrl() + '/' + self.target.getUrl() + '_dnsenum.json')
+        print('Result of the DNS\'s enumeration in the file results/' \
+                + self.target.getUrl() + '/' + self.target.getUrl() + '_dnsenum.json')
 
         if (self.args['-f']):
             resp=True
         else:
-            choice=input('Do you want to make a reverse DNS of C class on the target ? (y/n) : ')
+            choice=input('Do you want to make a reverse DNS of C class' \
+                            + 'on the target ? (y/n) : ')
             resp=self.processResponseYN(choice)
         if (resp):
-            print(Style.BRIGHT + 'Reverse DNS of C class in progress...' + Style.RESET_ALL)
+            self.custom_print('Reverse DNS of C class in progress...', Style.BRIGHT)
             dnsenum.processReverseDns()
-            print('Result of the reverse DNS of C class in the file results/' + self.target.getUrl() + '/' + self.target.getUrl() + '_rev_dns.txt')
+            print('Result of the reverse DNS of C class in the file results/' \
+                    + self.target.getUrl() + '/' + self.target.getUrl() \
+                    + '_rev_dns.txt')
             outputT=self.displayOtherResponse(self.target.getReverseDNS(), 'RD')
             outputJ=json.dumps(self.target.getReverseDNS())
             #print(outputJ)
@@ -243,18 +250,24 @@ class displayCLI(Thread):
         if (self.args['-f']):
             resp=True
         else:
-            choice=input('Do you want to make a subdomain\'s bruteforce to the target ? (y/n) : ')
+            choice=input('Do you want to make a subdomain\'s bruteforce to '\
+                    + 'the target ? (y/n) : ')
             resp=self.processResponseYN(choice)
         if (resp):
-            print('Used dictionary : ' + Fore.MAGENTA + self.dictio + Style.RESET_ALL)
-            print(Style.BRIGHT + 'Subdomain\'s bruteforce in progress...'+ Style.RESET_ALL)
+            print('Used dictionary : ', end='')
+            self.custom_print(self.dictio, Fore.MAGENTA)
+            self.custom_print('Subdomain\'s bruteforce in progress...', Style.BRIGHT)
             #dnsenum.processBFSubDomain()
             dnsenum.launchThreadBF()
-            output=self.displayOtherResponse(self.target.getSubDomain(), 'BF')
-            self.verboseOnOff(output, '_bf_subdom.txt')
-            print('Result of subdomain\'s bruteforce in the file results/' + self.target.getUrl() + '/' + self.target.getUrl() + '_bf_subdom.txt')
+            #output=self.displayOtherResponse(self.target.getSubDomain(), 'BF')
+            print(self.target.getSubDomain())
+            self.verboseOnOff(self.target.getSubDomain(), '_bf_subdom', 1)
+            print('Result of subdomain\'s bruteforce in the file results/'\
+                    + self.target.getUrl() + '/' + self.target.getUrl()\
+                    + '_bf_subdom.txt')
         else:
-            print(Fore.RED + Style.BRIGHT + 'Subdomain\'s bruteforce ignored' + Style.RESET_ALL)
+            print(Fore.RED + Style.BRIGHT + 'Subdomain\'s bruteforce ignored'\
+                    + Style.RESET_ALL)
 
     @decoratorTimerProcess
     def spiderSolo(self, name='Spider'):

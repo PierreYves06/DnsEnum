@@ -267,18 +267,21 @@ class Dnsenum():
         for line in fd:
             n+=1
         fd.close()
-        #print(n)
+        print(n)
         l=round(n/2)
         r=n%2
-        #print(l)
+        print(l)
         fd1=open('dic/dic1', 'wb')
         fd2=open('dic/dic2', 'wb')
         fd3=open(self.dictio, 'rb')
         i=1
         for line in fd3:
+            print(line)
             if (i < l):
+                print('fd1')
                 fd1.write(line)
             else:
+                print('fd2')
                 fd2.write(line)
             i+=1
         '''     
@@ -295,7 +298,7 @@ class Dnsenum():
         fd5.close()
         print(n)
         '''
-
+        input('Press a key')
         dictFinalBFSubDom={}
         t1=threading.Thread(None, self.processBFSubDomain, None, ('dic/dic1',))
         t2=threading.Thread(None, self.processBFSubDomain, None, ('dic/dic2',))
