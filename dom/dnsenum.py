@@ -269,7 +269,7 @@ class Dnsenum():
         fd.close()
         print(n)
         l=round(n/2)
-        r=n%2
+        #r=n%2
         print(l)
         fd1=open('dic/dic1', 'wb')
         fd2=open('dic/dic2', 'wb')
@@ -284,20 +284,6 @@ class Dnsenum():
                 print('fd2')
                 fd2.write(line)
             i+=1
-        '''     
-        fd4=open('dic/dic1', 'rb')
-        n=0
-        for line in fd4:
-            n+=1
-        fd4.close()
-        print(n)
-        fd5=open('dic/dic2', 'rb')
-        n=0
-        for line in fd5:
-            n+=1
-        fd5.close()
-        print(n)
-        '''
         input('Press a key')
         dictFinalBFSubDom={}
         t1=threading.Thread(None, self.processBFSubDomain, None, ('dic/dic1',))
