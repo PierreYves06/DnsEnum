@@ -262,29 +262,30 @@ class Dnsenum():
             self.chunkSubDom.append(dictBFSubDom)
 
     def launchThreadBF(self):
-        fd=open(self.dictio, 'rb')
+        fd=open(self.dictio, 'r')
         n=0
         for line in fd:
             n+=1
         fd.close()
-        print(n)
         l=round(n/2)
         #r=n%2
-        print(l)
-        fd1=open('dic/dic1', 'wb')
-        fd2=open('dic/dic2', 'wb')
-        fd3=open(self.dictio, 'rb')
+        fd3=open(self.dictio, 'r')
         i=1
+        fd1list=[]
+        fd2list=[]
         for line in fd3:
-            print(line)
             if (i < l):
-                print('fd1')
-                fd1.write(line)
+                fd1list.append(line)
             else:
-                print('fd2')
-                fd2.write(line)
+                fd2list.append(line)
             i+=1
-        input('Press a key')
+        fd3.close()
+        fd1=open('dic/dic1', 'w')
+        fd2=open('dic/dic2', 'w')
+        fd1.writelines(fd1list)
+        fd2.writelines(fd2list)
+        fd1.close()
+        fd2.close()
         dictFinalBFSubDom={}
         t1=threading.Thread(None, self.processBFSubDomain, None, ('dic/dic1',))
         t2=threading.Thread(None, self.processBFSubDomain, None, ('dic/dic2',))

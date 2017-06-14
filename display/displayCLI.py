@@ -258,7 +258,7 @@ class displayCLI(Thread):
             self.custom_print(self.dictio, Fore.MAGENTA)
             self.custom_print('Subdomain\'s bruteforce in progress...', Style.BRIGHT)
             #dnsenum.processBFSubDomain()
-            dnsenum.launchThreadBF()
+            dnsenum.launchThreadBF(2)
             #output=self.displayOtherResponse(self.target.getSubDomain(), 'BF')
             print(self.target.getSubDomain())
             self.verboseOnOff(self.target.getSubDomain(), '_bf_subdom', 1)
