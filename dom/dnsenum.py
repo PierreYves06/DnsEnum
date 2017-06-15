@@ -261,31 +261,54 @@ class Dnsenum():
             f.close()
             self.chunkSubDom.append(dictBFSubDom)
 
-    def launchThreadBF(self):
-        fd=open(self.dictio, 'r')
+    def launchThreadBF(self, nb):
+        fcount=open(self.dictio, 'r')
         n=0
-        for line in fd:
+        for line in fcount:
             n+=1
-        fd.close()
-        l=round(n/2)
-        #r=n%2
-        fd3=open(self.dictio, 'r')
+        fcount.close()
+        l=round(n/nb)
+        #r=n%nb
+        fsplit=open(self.dictio, 'r')
         i=1
-        fd1list=[]
-        fd2list=[]
-        for line in fd3:
+        count=0
+        listFile=[]
+        #Debut modif
+        while (count < nb):
+            list1File=[]
+            for line in fsplit:
+                if (i < l):
+                    list1File.append(line)
+                else:
+                    l+=l
+                    count+=1
+                    continue
+                i+=1
+            l+=l
+            count+=1
+            listFile.append(list1File)
+        print(listFile)
+        #Fin modif
+        '''
+        file1list=[]
+        file2list=[]
+        for line in fsplit:
             if (i < l):
-                fd1list.append(line)
+                file1list.append(line)
             else:
-                fd2list.append(line)
+                file2list.append(line)
             i+=1
-        fd3.close()
-        fd1=open('dic/dic1', 'w')
-        fd2=open('dic/dic2', 'w')
-        fd1.writelines(fd1list)
-        fd2.writelines(fd2list)
-        fd1.close()
-        fd2.close()
+        '''
+        fsplit.close()
+        #Debut modif
+        count=1
+        for item in listFile:
+            f=open('dic/dic'+str(count), 'w')
+            f.writelines(item)
+            f.close()
+            count+=1
+        #Fin modif
+        input('Press a key')
         dictFinalBFSubDom={}
         t1=threading.Thread(None, self.processBFSubDomain, None, ('dic/dic1',))
         t2=threading.Thread(None, self.processBFSubDomain, None, ('dic/dic2',))
