@@ -269,6 +269,8 @@ class Dnsenum():
         fcount.close()
         l=round(n/nb)
         #r=n%nb
+        print(n)
+        print(l)
         fsplit=open(self.dictio, 'r')
         i=1
         count=0
@@ -281,10 +283,10 @@ class Dnsenum():
                     list1File.append(line)
                 else:
                     l+=l
+                    print(l)
                     count+=1
                     continue
                 i+=1
-            l+=l
             count+=1
             listFile.append(list1File)
         print(listFile)
