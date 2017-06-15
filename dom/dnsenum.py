@@ -262,65 +262,77 @@ class Dnsenum():
             self.chunkSubDom.append(dictBFSubDom)
 
     def launchThreadBF(self, nb):
-        fcount=open(self.dictio, 'r')
+        fcount=open(self.dictio, 'rb')
         n=0
         for line in fcount:
+            try:
+                line.decode('utf-8')
+            except:
+                continue
             n+=1
         fcount.close()
         l=round(n/nb)
         #r=n%nb
-        print(n)
-        print(l)
-        fsplit=open(self.dictio, 'r')
+        #print(n)
+        #print(l)
+        fsplit=open(self.dictio, 'rb')
         i=1
         count=0
         listFile=[]
-        #Debut modif
         while (count < nb):
             list1File=[]
             for line in fsplit:
+                try:
+                    line=line.decode('utf-8')
+                except UnicodeDecodeError:
+                    continue
                 if (i < l):
                     list1File.append(line)
                 else:
                     l+=l
-                    print(l)
-                    count+=1
-                    continue
+                    break
                 i+=1
             count+=1
             listFile.append(list1File)
-        print(listFile)
-        #Fin modif
-        '''
-        file1list=[]
-        file2list=[]
-        for line in fsplit:
-            if (i < l):
-                file1list.append(line)
-            else:
-                file2list.append(line)
-            i+=1
-        '''
+        #print(listFile)
+
         fsplit.close()
-        #Debut modif
         count=1
         for item in listFile:
             f=open('dic/dic'+str(count), 'w')
             f.writelines(item)
             f.close()
             count+=1
-        #Fin modif
+
         input('Press a key')
         dictFinalBFSubDom={}
+
+        listThread=[]
+        c=1
+        while (c < count):
+            t=threading.Thread(None, self.processBFSubDomain, None, ('dic/dic'+str(c),))
+            listThread.append(t)
+            c+=1
+        for item in listThread:
+            item.start()
+        for item in listThread:
+            item.join()
+
+        '''     
         t1=threading.Thread(None, self.processBFSubDomain, None, ('dic/dic1',))
         t2=threading.Thread(None, self.processBFSubDomain, None, ('dic/dic2',))
         t1.start()
         t2.start()
         t1.join()
         t2.join()
+        '''
         for item in self.chunkSubDom:
             for key,value in item.items():
                 dictFinalBFSubDom[key]=value
         self.domain.setSubDomain(dictFinalBFSubDom)
-        subprocess.check_output(["rm", "dic/dic1"])
-        subprocess.check_output(["rm", "dic/dic2"])
+
+        c=1
+        while (c < count):
+            subprocess.check_output(['rm', 'dic/dic'+str(c)])
+            c+=1
+        
