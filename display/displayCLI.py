@@ -225,20 +225,20 @@ class displayCLI(Thread):
         output={'IP' : self.target.getIP(), 'NS' : self.target.getNS(),\
                  'MX' : self.target.getMX(), 'TXT' : self.target.getTXT()}
         self.verboseOnOff(output, '_dnsenum', 0)
-        print('Result of the DNS\'s enumeration in the file results/' \
+        print('Result of the DNS\'s enumeration in the file results/'\
                 + self.target.getUrl() + '/' + self.target.getUrl() + '_dnsenum.json')
 
         if (self.args['-f']):
             resp=True
         else:
-            choice=input('Do you want to make a reverse DNS of C class' \
+            choice=input('Do you want to make a reverse DNS of C class'\
                             + 'on the target ? (y/n) : ')
             resp=self.processResponseYN(choice)
         if (resp):
             self.custom_print('Reverse DNS of C class in progress...', Style.BRIGHT)
             dnsenum.processReverseDns()
-            print('Result of the reverse DNS of C class in the file results/' \
-                    + self.target.getUrl() + '/' + self.target.getUrl() \
+            print('Result of the reverse DNS of C class in the file results/'\
+                    + self.target.getUrl() + '/' + self.target.getUrl()\
                     + '_rev_dns.txt')
             outputT=self.displayOtherResponse(self.target.getReverseDNS(), 'RD')
             outputJ=json.dumps(self.target.getReverseDNS())
@@ -258,9 +258,9 @@ class displayCLI(Thread):
             self.custom_print(self.dictio, Fore.MAGENTA)
             self.custom_print('Subdomain\'s bruteforce in progress...', Style.BRIGHT)
             #dnsenum.processBFSubDomain()
-            dnsenum.launchThreadBF(2)
+            dnsenum.launchThreadBF(4)
             #output=self.displayOtherResponse(self.target.getSubDomain(), 'BF')
-            print(self.target.getSubDomain())
+            #print(self.target.getSubDomain())
             self.verboseOnOff(self.target.getSubDomain(), '_bf_subdom', 1)
             print('Result of subdomain\'s bruteforce in the file results/'\
                     + self.target.getUrl() + '/' + self.target.getUrl()\

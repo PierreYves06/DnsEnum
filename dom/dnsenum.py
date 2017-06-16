@@ -273,12 +273,11 @@ class Dnsenum():
         fcount.close()
         l=round(n/nb)
         #r=n%nb
-        #print(n)
-        #print(l)
         fsplit=open(self.dictio, 'rb')
         i=1
         count=0
         listFile=[]
+        print('nb : ' + str(nb))
         while (count < nb):
             list1File=[]
             for line in fsplit:
@@ -289,26 +288,29 @@ class Dnsenum():
                 if (i < l):
                     list1File.append(line)
                 else:
+                    print('l : ' + str(l))
                     l+=l
                     break
+                print('i : ' + str(i))
                 i+=1
             count+=1
+            print('count : ' + str(count))
             listFile.append(list1File)
-        #print(listFile)
 
         fsplit.close()
+        print(listFile)
         count=1
         for item in listFile:
             f=open('dic/dic'+str(count), 'w')
             f.writelines(item)
             f.close()
             count+=1
-
         input('Press a key')
         dictFinalBFSubDom={}
 
         listThread=[]
         c=1
+        '''
         while (c < count):
             t=threading.Thread(None, self.processBFSubDomain, None, ('dic/dic'+str(c),))
             listThread.append(t)
@@ -317,14 +319,6 @@ class Dnsenum():
             item.start()
         for item in listThread:
             item.join()
-
-        '''     
-        t1=threading.Thread(None, self.processBFSubDomain, None, ('dic/dic1',))
-        t2=threading.Thread(None, self.processBFSubDomain, None, ('dic/dic2',))
-        t1.start()
-        t2.start()
-        t1.join()
-        t2.join()
         '''
         for item in self.chunkSubDom:
             for key,value in item.items():
